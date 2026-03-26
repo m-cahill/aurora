@@ -1,0 +1,6 @@
+# M02: Ruff applies to support scripts under scripts/ only (see CI).
+line-length = 100
+target-version = "py311"
+
+[lint]
+select = ["E", "F", "I", "W"]

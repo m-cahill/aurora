@@ -1,0 +1,2 @@
+# M02 — exact pins for CI / local dev tools (support scripts only).
+ruff==0.15.7

@@ -1,0 +1,24 @@
+# Secrets / local env
+.env
+.env.*
+
+# Python environments
+.venv/
+venv/
+
+# Python cache / tooling
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# CI / verifier local output (not tracked)
+artifacts/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*~
