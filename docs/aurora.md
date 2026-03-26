@@ -168,7 +168,7 @@ M01 is **closed** (ledger below). **M02** is the next authorized milestone: **tr
 
 | ID | Title | Status | Initialized | Purpose | Closeout summary |
 |----|-------|--------|-------------|---------|------------------|
-| **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Ledger row and project-record header updated for M01 completion. **PR #1** open at closeout, ready to merge. **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
+| **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Closeout commit `742d9f0ff9c4a9e055d5fd28f46f1c8d265ccc8e` (ledger + header). **PR #1** open at closeout, ready to merge. **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
 
 ---
 
