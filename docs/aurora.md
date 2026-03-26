@@ -2,8 +2,8 @@
 
 **Canonical anchor:** AURORA is the governed acoustic runtime and MediaPipe refactor program tracked in this repository; it is a Foundry-aligned case study and the substrate for PANTANAL-1, aimed at deterministic, artifact-bound, replayable audio execution without pretending the upstream monorepo is already well-governed.
 
-**Status:** Active — milestone **M01** complete (see Milestone ledger)  
-**Last updated:** 2026-03-25 — **M01 closeout recorded (UTC):** 2026-03-26T04:00:00Z
+**Status:** Active — milestone **M02** (truthful CI skeleton); **M01** complete (see Milestone ledger)  
+**Last updated:** 2026-03-25 — **M01 closeout recorded (UTC):** 2026-03-26T04:00:00Z — **M02 implementation:** see Milestone ledger
 
 This file is the **authoritative project record** for the `aurora/` git repository. It is maintained at milestone boundaries (especially closeout) so the repo stays legible, bounded, and aligned with evidence from audits and preflight locks.
 
@@ -127,9 +127,9 @@ This section is a **planning map** — a proposal aligned to the vision and PANT
 
 A separate **C01–C05** track is reserved for **baseline and submission safety** (credible BirdCLEF path, frozen candidates, compliance). It runs **alongside** refactor phases; integration points with AURORA runtime surfaces are **not** fixed in M01. Location, tooling, and repo structure for this rail remain **deferred**.
 
-### Next milestone (M02)
+### Next milestone (M03)
 
-M01 is **closed** (ledger below). **M02** is the next authorized milestone: **truthful CI skeleton and repo safety rails** (Phase A) — **not** dispatcher work, **not** runtime seam normalization. See workspace `docs/milestones/M02/M02_plan.md`.
+**M02** (truthful CI skeleton and repo safety rails) is in flight on branch `m02-truthful-ci-skeleton` — see Milestone ledger. **M03** follows after M02 closeout; plan stub: workspace `docs/milestones/M03/M03_plan.md`.
 
 ---
 
@@ -168,7 +168,8 @@ M01 is **closed** (ledger below). **M02** is the next authorized milestone: **tr
 
 | ID | Title | Status | Initialized | Purpose | Closeout summary |
 |----|-------|--------|-------------|---------|------------------|
-| **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Closeout commit `742d9f0ff9c4a9e055d5fd28f46f1c8d265ccc8e` (ledger + header). **PR #1** open at closeout, ready to merge. **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
+| **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Closeout commit `742d9f0ff9c4a9e055d5fd28f46f1c8d265ccc8e` (ledger + header). **PR #1** merged to `main` (merge commit `2f4efea`). **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
+| **M02** | Truthful CI skeleton and repo safety rails | **In progress** | 2026-03-25 | First GitHub Actions workflow (`ci` / `repo-safety`), stdlib repo verifier, Ruff on `scripts/`, hygiene files; no runtime seam work. | **PR #2** (`m02-truthful-ci-skeleton` → `main`). Primary implementation commit **`4d1817e`**; ledger follow-ups on the same branch. CI **pass** on PR (workflow `ci`, job `repo-safety`). Example run IDs: `23577571189`, `23577573243`. Upload artifact name: **`m02-ci-artifacts`**. Intended GitHub required-check name: **`ci / repo-safety`** — **not** configured in repo settings by this milestone (document only). See workspace `docs/milestones/M02/M02_summary.md`. |
 
 ---
 
