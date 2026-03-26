@@ -2,8 +2,8 @@
 
 **Canonical anchor:** AURORA is the governed acoustic runtime and MediaPipe refactor program tracked in this repository; it is a Foundry-aligned case study and the substrate for PANTANAL-1, aimed at deterministic, artifact-bound, replayable audio execution without pretending the upstream monorepo is already well-governed.
 
-**Status:** Active — milestone **M02** (truthful CI skeleton); **M01** complete (see Milestone ledger)  
-**Last updated:** 2026-03-25 — **M01 closeout recorded (UTC):** 2026-03-26T04:00:00Z — **M02 implementation:** see Milestone ledger
+**Status:** Active — milestone **M03** next (Phase A continuation); **M01** and **M02** complete (see Milestone ledger)  
+**Last updated:** 2026-03-26 — **M02 closeout recorded (UTC):** 2026-03-26T06:10:00Z
 
 This file is the **authoritative project record** for the `aurora/` git repository. It is maintained at milestone boundaries (especially closeout) so the repo stays legible, bounded, and aligned with evidence from audits and preflight locks.
 
@@ -129,7 +129,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 
 ### Next milestone (M03)
 
-**M02** (truthful CI skeleton and repo safety rails) is in flight on branch `m02-truthful-ci-skeleton` — see Milestone ledger. **M03** follows after M02 closeout; plan stub: workspace `docs/milestones/M03/M03_plan.md`.
+**M02** is **closed** (ledger below). **M03** is the next milestone: Phase A — governance/safety continuation (branch-protection / required-check readiness, CI baseline expansion as justified). **Not** dispatcher or runtime seam work until Phase B is explicitly authorized. Plan: workspace `docs/milestones/M03/M03_plan.md`.
 
 ---
 
@@ -169,7 +169,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 | ID | Title | Status | Initialized | Purpose | Closeout summary |
 |----|-------|--------|-------------|---------|------------------|
 | **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Closeout commit `742d9f0ff9c4a9e055d5fd28f46f1c8d265ccc8e` (ledger + header). **PR #1** merged to `main` (merge commit `2f4efea`). **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
-| **M02** | Truthful CI skeleton and repo safety rails | **In progress** | 2026-03-25 | First GitHub Actions workflow (`ci` / `repo-safety`), stdlib repo verifier, Ruff on `scripts/`, hygiene files; no runtime seam work. | **PR #2** (`m02-truthful-ci-skeleton` → `main`). Primary implementation commit **`4d1817e`**; ledger follow-ups on the same branch. CI **pass** on PR (workflow `ci`, job `repo-safety`). Example run IDs: `23577571189`, `23577573243`. Upload artifact name: **`m02-ci-artifacts`**. Intended GitHub required-check name: **`ci / repo-safety`** — **not** configured in repo settings by this milestone (document only). See workspace `docs/milestones/M02/M02_summary.md`. |
+| **M02** | Truthful CI skeleton and repo safety rails | **Complete** | 2026-03-25 | First GitHub Actions workflow (`ci` / `repo-safety`), stdlib repo verifier, Ruff on `scripts/`, hygiene files; no runtime seam work. | **PR #2** merged to `main` (**merge commit `4e3843c9366b745363898fa2f5a273901ed73a8d`**, merged **2026-03-26T06:10:00Z**). Branch `m02-truthful-ci-skeleton` @ **`d9c67114a931809b178d855db16c10171482acd7`**; primary implementation **`4d1817eb4ecdf18b311babb195a479965682202b`**. Workflow **`.github/workflows/ci.yml`** (`ci`); job **`repo-safety`**; intended check name **`ci / repo-safety`**. Latest green runs on PR head: **`23577639206`** (pull_request, **success**), **`23577638447`** (push, **success**). Post-merge **`main`** @ merge SHA: run **`23580213498`** (push, **success**). Artifact: **`m02-ci-artifacts`**. **Branch protection / required checks not configured** in this session (manual follow-up). Post-merge closeout edits to this ledger live on `main` after merge commit `4e3843c`. Evidence: workspace `docs/milestones/M02/M02_summary.md`, `M02_run1.md`, `M02_audit.md`. |
 
 ---
 
