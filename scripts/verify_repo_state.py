@@ -6,13 +6,11 @@ Writes machine-readable results under artifacts/ and exits non-zero on failure.
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import subprocess
 from pathlib import Path
-
-REPO_ROOT = Path(__file__).resolve().parent.parent
-ARTIFACTS_DIR = REPO_ROOT / "artifacts"
 
 # Headings that M01 established as required continuity signals.
 REQUIRED_HEADING_SUBSTRINGS = (
@@ -31,11 +29,22 @@ CONTINUE_ON_ERROR_RE = re.compile(
     r"^\s*continue-on-error:\s*true\s*$", re.IGNORECASE | re.MULTILINE
 )
 
+# `uses:` step lines: list form (`- uses:`) or nested under `name:` (`uses:` only).
+USES_LINE_RE = re.compile(
+    r"^\s*(?:-\s+)?uses:\s*(.+?)(?:\s+#.*)?$"
+)
 
-def _git_ls_files() -> list[str]:
+# Full 40-char Git commit SHA (GitHub Actions pin rule).
+FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$", re.IGNORECASE)
+
+# Workflow-level `name:` must appear before `jobs:` so we do not match step names.
+JOBS_START_RE = re.compile(r"^jobs:\s*$", re.MULTILINE)
+
+
+def _git_ls_files(repo_root: Path) -> list[str]:
     proc = subprocess.run(
         ["git", "ls-files"],
-        cwd=REPO_ROOT,
+        cwd=repo_root,
         capture_output=True,
         text=True,
         check=False,
@@ -110,7 +119,91 @@ def _scan_markdown_links(repo_root: Path, tracked: list[str]) -> list[dict]:
     return issues
 
 
+def _split_workflow_header_and_jobs(text: str) -> tuple[str, str]:
+    """Return (text_before_jobs, text_from_jobs_onward)."""
+    m = JOBS_START_RE.search(text)
+    if not m:
+        return text, ""
+    return text[: m.start()], text[m.start() :]
+
+
+def _workflow_name_is_ci(header: str) -> bool:
+    """True if workflow-level name is exactly `ci` (quoted or not)."""
+    return bool(
+        re.search(
+            r"^\s*name:\s*[\"']?ci[\"']?\s*(?:#.*)?$",
+            header,
+            re.MULTILINE,
+        )
+    )
+
+
+def _workflow_has_repo_safety_job(jobs_section: str) -> bool:
+    """True if a job key `repo-safety` exists under jobs:."""
+    return bool(re.search(r"^\s+repo-safety:\s*$", jobs_section, re.MULTILINE))
+
+
+def _check_ci_workflow_identity(repo_root: Path) -> list[dict]:
+    """Ensure a workflow exposes the stable check identity `ci` / `repo-safety`."""
+    issues: list[dict] = []
+    wf_dir = repo_root / ".github" / "workflows"
+    if not wf_dir.is_dir():
+        issues.append(
+            {
+                "problem": "missing_workflows_dir",
+            }
+        )
+        return issues
+
+    found = False
+    for yml in sorted(wf_dir.glob("*.yml")) + sorted(wf_dir.glob("*.yaml")):
+        text = yml.read_text(encoding="utf-8")
+        header, jobs_sec = _split_workflow_header_and_jobs(text)
+        if _workflow_name_is_ci(header) and _workflow_has_repo_safety_job(jobs_sec):
+            found = True
+            break
+
+    if not found:
+        issues.append(
+            {
+                "problem": "missing_ci_repo_safety_identity",
+                "detail": "expected workflow name: ci and job key: repo-safety",
+            }
+        )
+    return issues
+
+
+def _check_uses_external_pin(uses_value: str) -> list[dict]:
+    """Validate external `uses:` strings use a full 40-char SHA after the last @."""
+    issues: list[dict] = []
+    val = uses_value.strip()
+    if val.startswith(("./", ".\\")):
+        return issues
+    if val.startswith("docker://"):
+        return issues
+    if "@" not in val:
+        issues.append(
+            {
+                "problem": "uses_missing_at_ref",
+                "detail": val,
+            }
+        )
+        return issues
+    _spec, ref = val.rsplit("@", 1)
+    ref = ref.strip()
+    if not FULL_SHA_RE.match(ref):
+        issues.append(
+            {
+                "problem": "uses_not_full_sha",
+                "detail": val,
+                "ref": ref,
+            }
+        )
+    return issues
+
+
 def _scan_workflows(repo_root: Path) -> list[dict]:
+    """Workflow truthfulness: soft-fail, floating runners, full SHA pins on uses."""
     issues: list[dict] = []
     wf_dir = repo_root / ".github" / "workflows"
     if not wf_dir.is_dir():
@@ -134,15 +227,24 @@ def _scan_workflows(repo_root: Path) -> list[dict]:
                         "detail": line.strip(),
                     }
                 )
+            m = USES_LINE_RE.match(line)
+            if not m:
+                continue
+            raw_val = m.group(1).strip().strip('"').strip("'")
+            for pin_issue in _check_uses_external_pin(raw_val):
+                issues.append({"file": rel, **pin_issue})
     return issues
 
 
-def main() -> int:
+def verify_repository(repo_root: Path) -> int:
+    """Run all governance checks; write artifacts under repo_root/artifacts. Return exit code."""
+    repo_root = repo_root.resolve()
+    artifacts_dir = repo_root / "artifacts"
     checks: list[dict] = []
     ok = True
 
     try:
-        tracked = _git_ls_files()
+        tracked = _git_ls_files(repo_root)
     except RuntimeError as exc:
         checks.append(
             {
@@ -154,8 +256,8 @@ def main() -> int:
         ok = False
         tracked = []
 
-    readme = REPO_ROOT / "README.md"
-    canon = REPO_ROOT / "docs" / "aurora.md"
+    readme = repo_root / "README.md"
+    canon = repo_root / "docs" / "aurora.md"
 
     readme_ok = readme.is_file()
     checks.append({"id": "readme_exists", "ok": readme_ok})
@@ -216,23 +318,34 @@ def main() -> int:
     )
     ok &= mp_ok
 
-    link_issues = _scan_markdown_links(REPO_ROOT, tracked)
+    link_issues = _scan_markdown_links(repo_root, tracked)
     link_ok = not link_issues
     checks.append({"id": "markdown_relative_links", "ok": link_ok, "issues": link_issues})
     ok &= link_ok
 
-    wf_issues = _scan_workflows(REPO_ROOT)
+    ci_id_issues = _check_ci_workflow_identity(repo_root)
+    ci_id_ok = not ci_id_issues
+    checks.append(
+        {
+            "id": "ci_workflow_identity",
+            "ok": ci_id_ok,
+            "issues": ci_id_issues,
+        }
+    )
+    ok &= ci_id_ok
+
+    wf_issues = _scan_workflows(repo_root)
     wf_ok = not wf_issues
     checks.append({"id": "workflow_policy", "ok": wf_ok, "issues": wf_issues})
     ok &= wf_ok
 
-    ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
     report = {
         "ok": ok,
-        "repo_root": str(REPO_ROOT),
+        "repo_root": str(repo_root),
         "checks": checks,
     }
-    out_json = ARTIFACTS_DIR / "repo_verification.json"
+    out_json = artifacts_dir / "repo_verification.json"
     out_json.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
     summary_lines = [
@@ -242,12 +355,29 @@ def main() -> int:
     if not ok:
         failed = [c["id"] for c in checks if not c.get("ok")]
         summary_lines.append("failed: " + ", ".join(failed))
-    (ARTIFACTS_DIR / "verification_summary.txt").write_text(
+    (artifacts_dir / "verification_summary.txt").write_text(
         "\n".join(summary_lines) + "\n",
         encoding="utf-8",
     )
 
     return 0 if ok else 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Verify aurora/ governance state.")
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=None,
+        help="Repository root (default: parent of scripts/).",
+    )
+    args = parser.parse_args()
+    root = (
+        args.repo_root.resolve()
+        if args.repo_root is not None
+        else Path(__file__).resolve().parent.parent
+    )
+    return verify_repository(root)
 
 
 if __name__ == "__main__":
