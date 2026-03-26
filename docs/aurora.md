@@ -2,8 +2,8 @@
 
 **Canonical anchor:** AURORA is the governed acoustic runtime and MediaPipe refactor program tracked in this repository; it is a Foundry-aligned case study and the substrate for PANTANAL-1, aimed at deterministic, artifact-bound, replayable audio execution without pretending the upstream monorepo is already well-governed.
 
-**Status:** Active — milestone **M03** next (Phase A continuation); **M01** and **M02** complete (see Milestone ledger)  
-**Last updated:** 2026-03-26 — **M02 closeout recorded (UTC):** 2026-03-26T06:10:00Z
+**Status:** Active — milestone **M04** next (Phase A may continue); **M01**, **M02**, and **M03** complete (see Milestone ledger)  
+**Last updated:** 2026-03-26 — **M03 closeout recorded (UTC):** 2026-03-26T23:20:00Z
 
 This file is the **authoritative project record** for the `aurora/` git repository. It is maintained at milestone boundaries (especially closeout) so the repo stays legible, bounded, and aligned with evidence from audits and preflight locks.
 
@@ -127,9 +127,9 @@ This section is a **planning map** — a proposal aligned to the vision and PANT
 
 A separate **C01–C05** track is reserved for **baseline and submission safety** (credible BirdCLEF path, frozen candidates, compliance). It runs **alongside** refactor phases; integration points with AURORA runtime surfaces are **not** fixed in M01. Location, tooling, and repo structure for this rail remain **deferred**.
 
-### Next milestone (M03)
+### Next milestone (M04)
 
-**M02** is **closed** (ledger below). **M03** is the next milestone: Phase A — governance/safety continuation (branch-protection / required-check readiness, CI baseline expansion as justified). **Not** dispatcher or runtime seam work until Phase B is explicitly authorized. Plan: workspace `docs/milestones/M03/M03_plan.md`.
+**M03** is **closed** (ledger below). **M04** is the next milestone; it may remain in **Phase A — Governance and Safety** unless the project record explicitly authorizes **Phase B**. Plan: workspace `docs/milestones/M04/M04_plan.md` when published.
 
 ---
 
@@ -170,6 +170,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 |----|-------|--------|-------------|---------|------------------|
 | **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Closeout commit `742d9f0ff9c4a9e055d5fd28f46f1c8d265ccc8e` (ledger + header). **PR #1** merged to `main` (merge commit `2f4efea`). **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
 | **M02** | Truthful CI skeleton and repo safety rails | **Complete** | 2026-03-25 | First GitHub Actions workflow (`ci` / `repo-safety`), stdlib repo verifier, Ruff on `scripts/`, hygiene files; no runtime seam work. | **PR #2** merged to `main` (**merge commit `4e3843c9366b745363898fa2f5a273901ed73a8d`**, merged **2026-03-26T06:10:00Z**). Branch `m02-truthful-ci-skeleton` @ **`d9c67114a931809b178d855db16c10171482acd7`**; primary implementation **`4d1817eb4ecdf18b311babb195a479965682202b`**. Workflow **`.github/workflows/ci.yml`** (`ci`); job **`repo-safety`**; intended check name **`ci / repo-safety`**. Latest green runs on PR head: **`23577639206`** (pull_request, **success**), **`23577638447`** (push, **success**). Post-merge **`main`**: successive pushes triggered **`ci` / `repo-safety`** — **all success** (representative run IDs: **`23580213498`**, **`23580245540`**, **`23580265101`**, **`23580299720`**; later doc-only commits may add further runs — see workspace **`M02_summary.md`**). Artifact: **`m02-ci-artifacts`**. **Branch protection / required checks not configured** in this session (manual follow-up). Evidence: workspace `M02_summary.md`, `M02_run1.md`, `M02_audit.md`. |
+| **M03** | Branch protection enforcement and CI governance hardening | **Complete** | 2026-03-26 | Harden verifier (full SHA pins for external Actions, `ci` / `repo-safety` identity), stdlib tests under `tests/`, CI artifact **`ci-artifacts`**, `DEVELOPMENT.md`; merge discipline on `main` via branch protection when permitted. | **PR #3** merged to `main` (**merge commit `ce53b7c0a2d596ed3adf05916a68551cf30104ff`**, **2026-03-26**). Branched from **`3d3830e07635ea97878bb714ccd399470fceae61`** (post-M02 `main`); primary implementation **`8716ab5509d606e087c50139bc268f273264d5bc`**. Workflow **`ci`**; job **`repo-safety`**; required check **`ci / repo-safety`**. Representative green runs: **`23621970097`** (push, feature branch), **`23621984590`** (pull_request), **`23622016833`** (push, post-merge `main`). **Branch protection on `main`:** **enabled** — `required_status_checks.strict: true`, required context **`ci / repo-safety`** (GitHub Actions app_id **15368**), **`required_pull_request_reviews`** with **0** approvals (PRs required). Evidence: `gh api repos/m-cahill/aurora/branches/main/protection`; workspace **`M03_summary.md`**. |
 
 ---
 
