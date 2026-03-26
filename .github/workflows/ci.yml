@@ -1,4 +1,4 @@
-# M02 — truthful CI skeleton. Actions pinned to full SHAs (tags noted in comments).
+# M03 — truthful governance CI. External Actions pinned to full SHAs (tags noted in comments).
 name: ci
 
 on:
@@ -29,15 +29,18 @@ jobs:
       - name: Verify repository state
         run: python scripts/verify_repo_state.py
 
-      - name: Ruff (support scripts)
-        run: ruff check scripts --output-format json > artifacts/ruff.json
+      - name: Ruff (scripts and governance tests)
+        run: ruff check scripts tests --output-format json > artifacts/ruff.json
 
-      - name: Compile support scripts
-        run: python -m compileall -q scripts && echo ok > artifacts/compileall_ok.txt
+      - name: Compile scripts and tests
+        run: python -m compileall -q scripts tests && echo ok > artifacts/compileall_ok.txt
+
+      - name: Governance support tests (unittest)
+        run: python -m unittest discover -s tests -v 2>&1 | tee artifacts/unittest.txt
 
       - name: Upload CI artifacts
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
-          name: m02-ci-artifacts
+          name: ci-artifacts
           path: artifacts/
