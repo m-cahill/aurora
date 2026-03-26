@@ -2,8 +2,8 @@
 
 **Canonical anchor:** AURORA is the governed acoustic runtime and MediaPipe refactor program tracked in this repository; it is a Foundry-aligned case study and the substrate for PANTANAL-1, aimed at deterministic, artifact-bound, replayable audio execution without pretending the upstream monorepo is already well-governed.
 
-**Status:** Active — initialized with milestone M01  
-**Last updated:** 2026-03-25
+**Status:** Active — milestone **M01** complete (see Milestone ledger)  
+**Last updated:** 2026-03-25 — **M01 closeout recorded (UTC):** 2026-03-26T04:00:00Z
 
 This file is the **authoritative project record** for the `aurora/` git repository. It is maintained at milestone boundaries (especially closeout) so the repo stays legible, bounded, and aligned with evidence from audits and preflight locks.
 
@@ -127,9 +127,9 @@ This section is a **planning map** — a proposal aligned to the vision and PANT
 
 A separate **C01–C05** track is reserved for **baseline and submission safety** (credible BirdCLEF path, frozen candidates, compliance). It runs **alongside** refactor phases; integration points with AURORA runtime surfaces are **not** fixed in M01. Location, tooling, and repo structure for this rail remain **deferred**.
 
-### Next milestone after M01
+### Next milestone (M02)
 
-**M02** is expected to be the **truthful CI skeleton and repo safety rails** milestone — not dispatcher or task-base work — so Phase A can complete before Phase B.
+M01 is **closed** (ledger below). **M02** is the next authorized milestone: **truthful CI skeleton and repo safety rails** (Phase A) — **not** dispatcher work, **not** runtime seam normalization. See workspace `docs/milestones/M02/M02_plan.md`.
 
 ---
 
@@ -168,7 +168,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 
 | ID | Title | Status | Initialized | Purpose | Closeout summary |
 |----|-------|--------|-------------|---------|------------------|
-| **M01** | Governance bootstrap, canonical docs initialization, and README anchor | In progress | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | *(Pending — fill at M01 closeout.)* |
+| **M01** | Governance bootstrap, canonical docs initialization, and README anchor | **Complete** | 2026-03-25 | Establish `aurora/docs/aurora.md` as the committed source of truth; minimal `README.md`; separate locked phases from proposed roadmap; no runtime or `mediapipe/` changes. | Delivered substantive `docs/aurora.md` and minimal `README.md` on PR #1 (`m01-governance-bootstrap` → `main`). Scope verified docs-only: no `mediapipe/` edits; no runtime/code under `aurora/`. Primary delivery commit `f32c205ae21010ed3f09e841d7debc16a65c5095`. Ledger row and project-record header updated for M01 completion. **PR #1** open at closeout, ready to merge. **Closeout recorded (UTC):** 2026-03-26T04:00:00Z. |
 
 ---
 
