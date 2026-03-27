@@ -34,6 +34,7 @@ def _minimal_aurora_md() -> str:
 
 Governance: `docs/runtime_surface_strategy.md`.
 Substrate: `docs/runtime_substrate.md`.
+Seam framing: `docs/runtime_seam_framing.md`.
 
 """
 
@@ -44,6 +45,35 @@ def _minimal_runtime_substrate_md() -> str:
 Placeholder for verifier fixtures.
 
 """
+
+
+def _minimal_runtime_seam_framing_md() -> str:
+    return """# Runtime seam framing
+
+Placeholder for verifier fixtures.
+
+"""
+
+
+def _minimal_seam_contract_src_files() -> dict[str, str]:
+    return {
+        "src/aurora/runtime/dispatcher.py": (
+            '"""D."""\n'
+            "from __future__ import annotations\n"
+            "from typing import Any, Protocol, runtime_checkable\n\n"
+            "@runtime_checkable\n"
+            "class Dispatcher(Protocol):\n"
+            "    def dispatch(self, *args: Any, **kwargs: Any) -> Any: ...\n"
+        ),
+        "src/aurora/runtime/library_loader.py": (
+            '"""L."""\n'
+            "from __future__ import annotations\n"
+            "from typing import Any, Protocol, runtime_checkable\n\n"
+            "@runtime_checkable\n"
+            "class LibraryLoader(Protocol):\n"
+            "    def shared_library(self) -> Any: ...\n"
+        ),
+    }
 
 
 def _minimal_substrate_src_files() -> dict[str, str]:
@@ -63,7 +93,9 @@ def _minimal_substrate_src_files() -> dict[str, str]:
 def _substrate_docs_and_src() -> dict[str, str]:
     return {
         "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+        "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
         **_minimal_substrate_src_files(),
+        **_minimal_seam_contract_src_files(),
     }
 
 
@@ -170,6 +202,7 @@ class TestVerifyRepoState(unittest.TestCase):
 ## Program Roadmap (proposed)
 
 Substrate: `docs/runtime_substrate.md`.
+Seam framing: `docs/runtime_seam_framing.md`.
 
 """
             files = {
@@ -317,7 +350,25 @@ jobs:
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
                 **_minimal_substrate_src_files(),
+                **_minimal_seam_contract_src_files(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_runtime_seam_framing_doc_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+                **_minimal_substrate_src_files(),
+                **_minimal_seam_contract_src_files(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -332,10 +383,27 @@ jobs:
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+                "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
                 "src/aurora/__init__.py": '"""A."""\n',
                 "src/aurora/runtime/__init__.py": '"""R."""\n',
+                **_minimal_seam_contract_src_files(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_seam_contract_file_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            del files["src/aurora/runtime/dispatcher.py"]
             _init_git_repo(root, files)
             rc = verify_repo_state.verify_repository(root)
             self.assertEqual(rc, 1)
