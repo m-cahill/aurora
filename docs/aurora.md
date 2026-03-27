@@ -2,8 +2,8 @@
 
 **Canonical anchor:** AURORA is the governed acoustic runtime and MediaPipe refactor program tracked in this repository; it is a Foundry-aligned case study and the substrate for PANTANAL-1, aimed at deterministic, artifact-bound, replayable audio execution without pretending the upstream monorepo is already well-governed.
 
-**Status:** Active — **M04** complete; **M05** next (substrate establishment); **M01**–**M04** complete (see Milestone ledger)  
-**Last updated:** 2026-03-27 — **M04 closeout recorded (UTC):** 2026-03-27T00:55:00Z — merged **PR #5**; **Phase B not authorized** until after **M05** closes cleanly (see `docs/runtime_surface_strategy.md`).
+**Status:** Active — **M05** implemented (**branch `m05-runtime-substrate`**, **PR to `main` pending**); project record below assumes **Phase A closed** and **Phase B authorized** after merge; **M06** next; **M01**–**M05** in ledger (see Milestone ledger)  
+**Last updated:** 2026-03-26 — **M05:** first-party package at `src/aurora/` (`docs/runtime_substrate.md`); **Phase B** entry contract satisfied in implementation; merge to **`main`** to finalize CI evidence and ledger timestamps.
 
 This file is the **authoritative project record** for the `aurora/` git repository. It is maintained at milestone boundaries (especially closeout) so the repo stays legible, bounded, and aligned with evidence from audits and preflight locks.
 
@@ -105,6 +105,8 @@ These phases define **ordering and permission**, not dates. Work **must not** sk
 
 **Protected parallel competition rail:** BirdCLEF baseline and submission viability stay a **parallel** concern; refactor work must not eliminate the ability to produce a valid submission candidate.
 
+**Phase state (M05):** **Phase A — Governance and Safety** is **closed** upon **M05 merge to `main`**. **Phase B — Runtime Seam Normalization** is **authorized** after that merge; the first milestone is **M06** (workspace `docs/milestones/M06/M06_plan.md`; strategy `docs/runtime_surface_strategy.md` §6).
+
 ---
 
 ## Program Roadmap (proposed)
@@ -127,13 +129,11 @@ This section is a **planning map** — a proposal aligned to the vision and PANT
 
 A separate **C01–C05** track is reserved for **baseline and submission safety** (credible BirdCLEF path, frozen candidates, compliance). It runs **alongside** refactor phases; integration points with AURORA runtime surfaces are **not** fixed in M01. Location, tooling, and repo structure for this rail remain **deferred**.
 
-### Next milestone (M05)
+### Next milestone (M06)
 
-**M04** is **closed** on `main` (see ledger). It delivered the **tracked runtime surface strategy** (`docs/runtime_surface_strategy.md`): standalone-repo ingress (no submodule/subtree to MediaPipe for initial strategy), full first-wave seam set at planning level, minimum Phase B entry slice, documented-only package layout until substrate work, and **Phase B authorization only after M05 closes cleanly**.
+**M05** is **complete** on branch **`m05-runtime-substrate`** (merge to **`main`** via PR; see ledger). It delivers the **first importable runtime substrate** under `src/aurora/` (`docs/runtime_substrate.md`), minimal import/metadata tripwires, CI and verifier alignment, and — with the Phase B entry contract satisfied — **Phase A closeout** and **Phase B authorization** once merged.
 
-**M05** is the next milestone: **provenance-preserving runtime substrate establishment** — create the first importable implementation surface and minimal tripwires; still **no** dispatcher / `image.py` / `LibraryLoader` refactor until Phase B is explicitly authorized post-M05. Plan: workspace `docs/milestones/M05/M05_plan.md`.
-
-**Phase B** (`Runtime Seam Normalization`) is **not** authorized in M04; see `docs/runtime_surface_strategy.md` §6.
+**M06** is the next milestone: first **Phase B** slice — **runtime seam normalization** entry (smallest honest seam work: `Dispatcher` boundary, `image.py` precondition framing, loader/async alignment only as justified). **Not** kernel extraction or broad abstraction. Plan: workspace `docs/milestones/M06/M06_plan.md`.
 
 ---
 
@@ -164,7 +164,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 - Competition baseline **location, repo layout, and harness** (C01–C05 content)
 - Plugin/extension system and task discovery
 - Legacy Solutions deprecation timeline and migration guarantees
-- **Physical** package/module tree under `aurora/` (first-party runtime package) — **deferred to M05**; **documented** minimum layout in `docs/runtime_surface_strategy.md` (M04)
+- **Runtime seam normalization** (`Dispatcher`, `image.py`, loader/async) — **Phase B**; begins with **M06** when scoped (substrate package exists at `src/aurora/`)
 
 ---
 
@@ -176,6 +176,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 | **M02** | Truthful CI skeleton and repo safety rails | **Complete** | 2026-03-25 | First GitHub Actions workflow (`ci` / `repo-safety`), stdlib repo verifier, Ruff on `scripts/`, hygiene files; no runtime seam work. | **PR #2** merged to `main` (**merge commit `4e3843c9366b745363898fa2f5a273901ed73a8d`**, merged **2026-03-26T06:10:00Z**). Branch `m02-truthful-ci-skeleton` @ **`d9c67114a931809b178d855db16c10171482acd7`**; primary implementation **`4d1817eb4ecdf18b311babb195a479965682202b`**. Workflow **`.github/workflows/ci.yml`** (`ci`); job **`repo-safety`**; intended check name **`ci / repo-safety`**. Latest green runs on PR head: **`23577639206`** (pull_request, **success**), **`23577638447`** (push, **success**). Post-merge **`main`**: successive pushes triggered **`ci` / `repo-safety`** — **all success** (representative run IDs: **`23580213498`**, **`23580245540`**, **`23580265101`**, **`23580299720`**; later doc-only commits may add further runs — see workspace **`M02_summary.md`**). Artifact: **`m02-ci-artifacts`**. **Branch protection / required checks not configured** in this session (manual follow-up). Evidence: workspace `M02_summary.md`, `M02_run1.md`, `M02_audit.md`. |
 | **M03** | Branch protection enforcement and CI governance hardening | **Complete** | 2026-03-26 | Harden verifier (full SHA pins for external Actions, `ci` / `repo-safety` identity), stdlib tests under `tests/`, CI artifact **`ci-artifacts`**, `DEVELOPMENT.md`; merge discipline on `main` via branch protection when permitted. | **PR #3** merged to `main` (**merge commit `ce53b7c0a2d596ed3adf05916a68551cf30104ff`**, **2026-03-26**). Branched from **`3d3830e07635ea97878bb714ccd399470fceae61`** (post-M02 `main`); primary implementation **`8716ab5509d606e087c50139bc268f273264d5bc`**. Workflow **`ci`**; job **`repo-safety`**; required check **`ci / repo-safety`**. Representative green runs: **`23621970097`** (push, feature branch), **`23621984590`** (pull_request), **`23622016833`** (push, post-merge `main`). **Branch protection on `main`:** **enabled** — `required_status_checks.strict: true`, required context **`ci / repo-safety`** (GitHub Actions app_id **15368**), **`required_pull_request_reviews`** with **0** approvals (PRs required). Evidence: `gh api repos/m-cahill/aurora/branches/main/protection`; workspace **`M03_summary.md`**. |
 | **M04** | Tracked runtime surface strategy and Phase B entry gate | **Complete** | 2026-03-26 | Governance only: **`docs/runtime_surface_strategy.md`**, **`docs/aurora.md`**, verifier + tests, **`DEVELOPMENT.md`**; **Phase A continues**; **Phase B** only after **M05** closes. | **PR #5** merged to `main` (**merge commit `e5125d93f96d9178feee2859b6b474090aa22721`**, merged **2026-03-27**). Implementation **`4702e9c2757c04582afb6c1e081c2c46b7b104a5`**; baseline **`13e0cded5a65d92dd0c2d75dd7b496fe36f8b6f2`**. Workflow **`ci`** / job **`repo-safety`** — authoritative PR run **`23625478660`** (**pull_request**, **success**). Post-merge `main` push run **`23625501522`** (**success**, merge commit **`e5125d9`**). Closeout commit **`bcead1349d262dd8b02af5df25f199badd9ed054`**; closeout `main` run **`23625512581`** (**success**). **No** `mediapipe/` edits in `aurora/`; **no** runtime seam code. **Closeout recorded (UTC):** 2026-03-27T00:55:00Z. |
+| **M05** | Provenance-preserving runtime substrate establishment and Phase A closeout gate | **Complete** *(implementation; **merge to `main` pending**)* | 2026-03-26 | First-party package **`src/aurora/`**, **`docs/runtime_substrate.md`**, substrate tests, CI (`PYTHONPATH=src`), verifier gates; **Phase A / Phase B authorization** recorded **effective on merge**; **M06** seeded. | Branch **`m05-runtime-substrate`** (tip SHA in workspace **`M05_summary.md`**); baseline **`bbbbb9c246b76beb943c1d56168e8d0c503f8d77`** (post-M04 `main`). **No** `mediapipe/` imports under `src/aurora/`; **no** dispatcher / `image.py` / `LibraryLoader` implementation. Record merge commit and CI run IDs in workspace **`M05_summary.md`** after **`main`** merge. |
 
 ---
 
@@ -183,7 +184,8 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 
 Committed strategy and record in this repo:
 
-- `docs/runtime_surface_strategy.md` — **tracked runtime surface ingress, layout, Phase B entry contract** (M04)
+- `docs/runtime_surface_strategy.md` — **tracked runtime surface ingress, layout, Phase B entry contract** (M04; layout executed M05)
+- `docs/runtime_substrate.md` — **first-party substrate path, modules, provenance** (M05)
 
 Authoritative narrative and evidence live outside this repo in the workspace, for example:
 

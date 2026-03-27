@@ -2,7 +2,7 @@
 
 **Status:** Canonical governance document (committed)  
 **Role:** Defines how a legitimate implementation surface may enter `aurora/` and what must exist before Phase B (runtime seam normalization) is authorized.  
-**Last updated:** 2026-03-26 (M04)
+**Last updated:** 2026-03-26 (M05 — layout executed; see `docs/runtime_substrate.md`)
 
 This document is the **committed gate** for future runtime work. It does not establish runtime code by itself; it records an auditable decision the repo can execute against.
 
@@ -14,24 +14,26 @@ This document is the **committed gate** for future runtime work. It does not est
 
 The tracked repository (`m-cahill/aurora`) currently contains:
 
-- **Governance and safety tooling:** `scripts/verify_repo_state.py`, CI workflow (`ci` / `repo-safety`), Ruff configuration, support-tier tests under `tests/`.
+- **Governance and safety tooling:** `scripts/verify_repo_state.py`, CI workflow (`ci` / `repo-safety`), Ruff configuration, tests under `tests/`.
+- **First-party runtime substrate (M05):** importable package under `src/aurora/` (see `docs/runtime_substrate.md`); minimal metadata in `src/aurora/runtime/surface.py`. **Not** MediaPipe behavior or dispatch implementation.
 - **Canonical project record:** `docs/aurora.md`, `README.md`, `DEVELOPMENT.md`.
 - **Verification artifacts:** outputs under `artifacts/` produced by the verifier.
 
-These surfaces are sufficient to prove **repo hygiene, workflow identity, and documentation continuity**. They are **not** a MediaPipe runtime, task API, or Python/native dispatch implementation.
+These surfaces prove **repo hygiene, workflow identity, documentation continuity, and substrate importability** with truthful CI. They are **not** a claim of MediaPipe application correctness, task API completeness, or Python/native dispatch normalization (Phase B work).
 
 ### 1.2 What does not yet exist
 
-- A **first-party Python package** (or equivalent) that owns runtime behavior for Tasks API seams.
 - **Dispatcher / loader abstractions** or migrations off raw CDLL paths (Phase B scope).
-- **Smoke, import, or build tripwires** that exercise application or native runtime correctness.
+- **Smoke or build tripwires** that exercise **application or native runtime correctness** beyond import/metadata checks for the new substrate.
 - Any **import or copy** of MediaPipe source from the workspace `mediapipe/` read-only clone into `aurora/`.
+
+**M05 update:** A **first-party Python package** now exists at `src/aurora/` with minimal metadata (`docs/runtime_substrate.md`). It does **not** implement Tasks API seams or MediaPipe behavior.
 
 ### 1.3 Why honest runtime work cannot start without a strategy
 
-Phase B (see `docs/aurora.md`, *Execution Phase Boundaries*) assumes there is a **tracked place** to normalize seams (`Dispatcher`, `image.py`, loader semantics, documented async behavior). Today that place is **undefined**: package layout was explicitly **deferred**, and the only MediaPipe code lives outside the `aurora/` repo boundary.
+Phase B (see `docs/aurora.md`, *Execution Phase Boundaries*) assumes there is a **tracked place** to normalize seams (`Dispatcher`, `image.py`, loader semantics, documented async behavior). **M05** establishes that place as the **`src/aurora/`** package (see `docs/runtime_substrate.md`). Seam normalization remains **out of scope** until Phase B is authorized per §6.
 
-Without a written, provenance-respecting **ingress strategy** and a **minimal layout** decision, “start Phase B” would mean either violating the clean-room rule (copying upstream code) or pretending the repo contains runtime surfaces it does not. M04 closes that gap by **deciding** how runtime code may appear in `aurora/` and what must happen **before** Phase B is authorized.
+M04 closed the gap by **deciding** ingress and layout; M05 **executes** the minimal substrate so Phase B can target a real package boundary.
 
 ---
 
@@ -99,31 +101,33 @@ Broader smoke-test coverage expands as the surface grows; M04 does **not** requi
 
 ---
 
-## 5. Minimum package/module layout (documented only)
+## 5. Minimum package/module layout (executed in M05)
 
-**M04 does not create directories.** The following is the **planned** layout when `aurora/` gains a substrate (target: **M05**).
+**M05** created the first physical layout. The **chosen** package root is:
 
 | Location | Purpose |
 |----------|---------|
-| **`aurora/src/aurora/`** (or `aurora/aurora/` as a single package root) | **Python package root** for first-party runtime code. Exact top-level name (`aurora` vs `aurora_runtime`) is fixed at substrate establishment with one import path. |
-| **`aurora/tests/`** (existing) | **Extend** with tests colocated by feature (`tests/test_runtime_*.py` or subpackages) when runtime modules exist. |
-| **`aurora/docs/`** | **Architecture and governance docs** for runtime (`aurora.md`, this file, future ADRs). |
+| **`aurora/src/aurora/`** | **Python package root** for first-party runtime code (`import aurora` with `PYTHONPATH=src`). |
+| **`aurora/tests/`** | Tests including `tests/test_runtime_surface.py` and verifier tests. |
+| **`aurora/docs/`** | **Architecture and governance docs** including `runtime_substrate.md`, `aurora.md`, this file. |
 
-**Rule:** Keep the tree **small**. No empty placeholder packages in M04; M05 creates the first real modules when substrate is established.
+The alternative single package root under `aurora/` without `src/` was **not** used for M05. Future layout changes require an explicit milestone and updates to this document and `docs/runtime_substrate.md`.
+
+**Rule:** Keep the tree **small** — M05 modules are metadata-only; no placeholder seam implementations.
 
 ---
 
 ## 6. Phase B entry contract
 
-Phase B is **not** authorized at M04 closeout. The following must **all** be true **before** `Phase B — Runtime Seam Normalization` is explicitly authorized in `docs/aurora.md`:
+Phase B is **not** authorized until the following are **all** true and recorded in `docs/aurora.md`:
 
-1. **M05 complete** — *Provenance-preserving runtime substrate establishment* (or equivalent milestone) has closed with recorded commit SHA and honest CI.
-2. **Implementation surface present** — At least one importable Python package (or agreed equivalent) exists under `aurora/` with a defined scope, not only scripts and verifier tests.
-3. **Provenance strategy executed** — Runtime code entered via §3 (standalone repo, no copy from `mediapipe/`), with dependencies pinned as appropriate.
-4. **Minimal tripwires** — `unittest` (or agreed CI) checks that the new surface **imports** and passes **minimal smoke** checks appropriate to that surface; CI remains truthful (no false claims of MediaPipe correctness).
-5. **First Phase B milestone scope locked** — e.g. dispatcher formalization + `image.py` precondition + loader/async doc slice as in §4.1.
+1. **M05 complete** — *Provenance-preserving runtime substrate establishment* closed with recorded commit SHA and honest CI.
+2. **Implementation surface present** — Importable package at `src/aurora/` with defined scope (`docs/runtime_substrate.md`), not only scripts and verifier tests.
+3. **Provenance strategy executed** — Runtime code entered via §3 (standalone repo, no copy from `mediapipe/`).
+4. **Minimal tripwires** — `unittest` checks **import** and **substrate metadata**; CI remains truthful (no false claims of MediaPipe correctness).
+5. **First Phase B milestone scope locked** — **M06** is the first Phase B milestone: smallest honest runtime-seam slice (dispatcher boundary formalization, `image.py` precondition framing, loader/async alignment only as justified — see milestone plan in workspace `docs/milestones/M06/M06_plan.md`).
 
-**Authorization rule:** **Phase B is explicitly authorized only after M05 closes cleanly**, not merely because a strategy exists.
+**Authorization rule:** **Phase B is explicitly authorized only when M05’s exit conditions are actually met** (including merge of M05 to **`main`** with green **`ci` / `repo-safety`**), not merely because a strategy or empty package exists.
 
 ---
 
@@ -139,7 +143,7 @@ Phase B is **not** authorized at M04 closeout. The following must **all** be tru
 
 ## 8. What this document does not prove
 
-This strategy does **not** prove MediaPipe or application correctness. CI may still **only** cover governance scripts, verifier, and documented gates until runtime code and tests exist.
+This strategy does **not** prove MediaPipe or application correctness. With M05, CI additionally proves **substrate importability and metadata** for `src/aurora/` — still **not** MediaPipe behavior, native graphs, or full seam normalization.
 
 ---
 

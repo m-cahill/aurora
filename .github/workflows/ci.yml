@@ -29,13 +29,15 @@ jobs:
       - name: Verify repository state
         run: python scripts/verify_repo_state.py
 
-      - name: Ruff (scripts and governance tests)
-        run: ruff check scripts tests --output-format json > artifacts/ruff.json
+      - name: Ruff (scripts, tests, and runtime src)
+        run: ruff check scripts tests src --output-format json > artifacts/ruff.json
 
-      - name: Compile scripts and tests
-        run: python -m compileall -q scripts tests && echo ok > artifacts/compileall_ok.txt
+      - name: Compile scripts, tests, and runtime src
+        run: python -m compileall -q scripts tests src && echo ok > artifacts/compileall_ok.txt
 
-      - name: Governance support tests (unittest)
+      - name: Tests (unittest; PYTHONPATH=src for aurora package)
+        env:
+          PYTHONPATH: src
         run: python -m unittest discover -s tests -v 2>&1 | tee artifacts/unittest.txt
 
       - name: Upload CI artifacts
