@@ -7,10 +7,18 @@ Writes machine-readable results under artifacts/ and exits non-zero on failure.
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import subprocess
 from pathlib import Path
+
+# M05: tracked first-party package paths (must be git-tracked).
+SUBSTRATE_REQUIRED_FILES = (
+    "src/aurora/__init__.py",
+    "src/aurora/runtime/__init__.py",
+    "src/aurora/runtime/surface.py",
+)
 
 # Headings that M01 established as required continuity signals.
 REQUIRED_HEADING_SUBSTRINGS = (
@@ -71,6 +79,57 @@ def _safe_tracked_path(path: str) -> tuple[bool, str | None]:
 
 def _readme_links_to_canonical_doc(readme_text: str) -> bool:
     return bool(re.search(r"\]\(\s*docs/aurora\.md\s*\)", readme_text))
+
+
+def _mediapipe_import_issues(repo_root: Path, tracked: list[str]) -> list[dict]:
+    """Disallow `import mediapipe` / `from mediapipe` under src/aurora/."""
+    issues: list[dict] = []
+    for rel in tracked:
+        if not rel.startswith("src/aurora/") or not rel.endswith(".py"):
+            continue
+        fpath = repo_root / rel
+        if not fpath.is_file():
+            continue
+        text = fpath.read_text(encoding="utf-8")
+        try:
+            tree = ast.parse(text, filename=rel)
+        except SyntaxError as exc:
+            issues.append(
+                {
+                    "file": rel,
+                    "problem": "syntax_error",
+                    "detail": str(exc),
+                }
+            )
+            continue
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    name = alias.name
+                    if name == "mediapipe" or name.startswith("mediapipe."):
+                        issues.append(
+                            {
+                                "file": rel,
+                                "problem": "mediapipe_import",
+                                "detail": name,
+                            }
+                        )
+            elif isinstance(node, ast.ImportFrom):
+                mod = node.module
+                if mod and (mod == "mediapipe" or mod.startswith("mediapipe.")):
+                    issues.append(
+                        {
+                            "file": rel,
+                            "problem": "mediapipe_import",
+                            "detail": mod,
+                        }
+                    )
+    return issues
+
+
+def _missing_substrate_files(tracked: list[str]) -> list[str]:
+    tracked_set = set(tracked)
+    return [f for f in SUBSTRATE_REQUIRED_FILES if f not in tracked_set]
 
 
 def _scan_markdown_links(repo_root: Path, tracked: list[str]) -> list[dict]:
@@ -272,6 +331,11 @@ def verify_repository(repo_root: Path) -> int:
     checks.append({"id": "runtime_surface_strategy_doc_exists", "ok": rs_doc_ok})
     ok &= rs_doc_ok
 
+    runtime_substrate = repo_root / "docs" / "runtime_substrate.md"
+    rsub_doc_ok = runtime_substrate.is_file()
+    checks.append({"id": "runtime_substrate_doc_exists", "ok": rsub_doc_ok})
+    ok &= rsub_doc_ok
+
     if readme_ok:
         readme_text = readme.read_text(encoding="utf-8")
         link_ok = _readme_links_to_canonical_doc(readme_text)
@@ -299,6 +363,15 @@ def verify_repository(repo_root: Path) -> int:
             }
         )
         ok &= ref_rs
+
+        ref_sub = "runtime_substrate.md" in body
+        checks.append(
+            {
+                "id": "canonical_doc_references_runtime_substrate",
+                "ok": ref_sub,
+            }
+        )
+        ok &= ref_sub
 
     env_hits = [
         p
@@ -331,6 +404,28 @@ def verify_repository(repo_root: Path) -> int:
         }
     )
     ok &= mp_ok
+
+    missing_sub = _missing_substrate_files(tracked)
+    sub_files_ok = not missing_sub
+    checks.append(
+        {
+            "id": "substrate_package_files_tracked",
+            "ok": sub_files_ok,
+            "missing": missing_sub,
+        }
+    )
+    ok &= sub_files_ok
+
+    mp_import_issues = _mediapipe_import_issues(repo_root, tracked)
+    mp_import_ok = not mp_import_issues
+    checks.append(
+        {
+            "id": "no_mediapipe_imports_under_src_aurora",
+            "ok": mp_import_ok,
+            "issues": mp_import_issues,
+        }
+    )
+    ok &= mp_import_ok
 
     link_issues = _scan_markdown_links(repo_root, tracked)
     link_ok = not link_issues

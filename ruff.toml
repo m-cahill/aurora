@@ -1,4 +1,4 @@
-# M02: Ruff applies to support scripts under scripts/ only (see CI).
+# Ruff applies to scripts/, tests/, and src/ (see CI).
 line-length = 100
 target-version = "py311"
 

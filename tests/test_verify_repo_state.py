@@ -33,8 +33,38 @@ def _minimal_aurora_md() -> str:
 ## Program Roadmap (proposed)
 
 Governance: `docs/runtime_surface_strategy.md`.
+Substrate: `docs/runtime_substrate.md`.
 
 """
+
+
+def _minimal_runtime_substrate_md() -> str:
+    return """# Runtime substrate
+
+Placeholder for verifier fixtures.
+
+"""
+
+
+def _minimal_substrate_src_files() -> dict[str, str]:
+    return {
+        "src/aurora/__init__.py": '"""A."""\n',
+        "src/aurora/runtime/__init__.py": '"""R."""\n',
+        "src/aurora/runtime/surface.py": (
+            '"""S."""\n'
+            "from dataclasses import dataclass\n\n"
+            "@dataclass(frozen=True, slots=True)\n"
+            "class _T:\n"
+            "    v: int = 0\n"
+        ),
+    }
+
+
+def _substrate_docs_and_src() -> dict[str, str]:
+    return {
+        "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+        **_minimal_substrate_src_files(),
+    }
 
 
 def _minimal_readme() -> str:
@@ -99,6 +129,7 @@ class TestVerifyRepoState(unittest.TestCase):
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -138,11 +169,14 @@ class TestVerifyRepoState(unittest.TestCase):
 
 ## Program Roadmap (proposed)
 
+Substrate: `docs/runtime_substrate.md`.
+
 """
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": bad_aurora,
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -156,6 +190,7 @@ class TestVerifyRepoState(unittest.TestCase):
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": "# no headings\n",
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -169,6 +204,7 @@ class TestVerifyRepoState(unittest.TestCase):
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
                 ".env": "SECRET=1\n",
             }
@@ -190,6 +226,7 @@ class TestVerifyRepoState(unittest.TestCase):
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": wf,
             }
             _init_git_repo(root, files)
@@ -211,6 +248,7 @@ jobs:
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": wf,
             }
             _init_git_repo(root, files)
@@ -224,6 +262,7 @@ jobs:
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(
                     uses_line="      - uses: actions/checkout@v4.2.2"
                 ),
@@ -240,6 +279,7 @@ jobs:
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(
                     uses_line=f"      - uses: actions/checkout@{short_sha}"
                 ),
@@ -263,7 +303,38 @@ jobs:
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
                 ".github/workflows/ci.yml": wf,
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_runtime_substrate_doc_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_minimal_substrate_src_files(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_substrate_package_file_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+                "src/aurora/__init__.py": '"""A."""\n',
+                "src/aurora/runtime/__init__.py": '"""R."""\n',
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
             rc = verify_repo_state.verify_repository(root)
