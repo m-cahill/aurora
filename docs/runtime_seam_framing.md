@@ -1,7 +1,7 @@
-# AURORA — Runtime seam framing (Phase B, M06–M07)
+# AURORA — Runtime seam framing (Phase B, M06–M08)
 
-**Status:** Canonical committed framing (M06 contracts; M07 concrete loader)  
-**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`image.py`** still needs for migration, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
+**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam)  
+**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
 
 **Last updated:** 2026-03-27
 
@@ -36,6 +36,19 @@ M07 adds a **minimal concrete** `SharedLibraryLoader` in `src/aurora/runtime/sha
 
 ---
 
+## 1b. What M08 proves
+
+M08 adds a **bounded** first-party image seam in `src/aurora/runtime/image.py`:
+
+- **`AuroraImage`** — small class with `from_file` and `from_bytes` class methods; both obtain the shared-library handle via **`LibraryLoader.shared_library()`** and route work through **`Dispatcher.dispatch(...)`** using operation tokens `aurora_image_from_file` and `aurora_image_from_bytes` (no change to the **`Dispatcher`** Protocol shape).
+- **No `ctypes` / `CDLL` in `image.py`** — this module does not load native libraries directly; **`SharedLibraryLoader`** remains the only first-party module that calls `ctypes.CDLL` (M07).
+- **`ImageCreationError`** — single failure type for loader/dispatch failures, with exception chaining preserved.
+- **Verifier** tracks `image.py` structurally; **tests** use fakes (no real host libraries).
+
+**What M08 does not prove:** Upstream MediaPipe `vision` / Tasks **`image.py`** parity, correct decoding of any file format, native graph correctness, domain smoke coverage, task bases, or kernel work.
+
+---
+
 ## 2. `Dispatcher` contract
 
 **Intent:** Make the Python/native **dispatch seam** explicit at the type level first.
@@ -54,15 +67,13 @@ Audits identify a real constraint: a **single** `_shared_lib`-style handle (not 
 
 ---
 
-## 4. `image.py` as a bounded outlier (preconditions only)
+## 4. Bounded image seam vs upstream `image.py` outlier
 
-Upstream, **`image.py`** is treated as a **bounded outlier** for raw `CDLL` / loading paths relative to other Tasks API modules. **Neither M06 nor M07 migrates `image.py`.** Preconditions for a future, behavior-preserving migration now include:
+Audits treat upstream MediaPipe **`image.py`** as the **bounded outlier** that bypasses `SerialDispatcher` for raw native access. **M08 does not modify upstream** — the workspace `mediapipe/` clone stays untouched.
 
-- A stable **loader** contract and documented singleton semantics (M06 **contract**; M07 **concrete** `SharedLibraryLoader` with explicit path and per-instance memoization — **not** upstream wiring).
-- A **Dispatcher** boundary that call sites can target without entangling raw CDLL details in every module.
-- Tests and evidence that a migration does not break import or dispatch assumptions (still **future** work).
+Inside **`aurora/`**, M08 introduces **`src/aurora/runtime/image.py`** so the **first-party** image-shaped seam routes through the same **Dispatcher** and **LibraryLoader** abstractions as the rest of the Phase B story: no `CDLL` calls in `image.py`, fake-backed tests, honest non-claims.
 
-**M07** satisfies the “stable loader semantics” slice **inside** `aurora/`; **`image.py` migration** remains a **separate** milestone.
+Migrating **upstream** Tasks `image.py` onto a dispatcher (in a fork) remains **out of scope** for this repository’s tracked work; this milestone only establishes the **in-repo** bounded surface and proof pattern.
 
 ---
 
@@ -89,16 +100,25 @@ M06 does **not**:
 - introduce `VisionTaskBase` / `AudioTaskBase`, kernel extraction, or C API signature changes;
 - copy or import MediaPipe source from the workspace clone;
 - claim MediaPipe or native-runtime correctness;
-- perform the actual **`image.py`** migration.
+- perform **`image.py`**-style migration (M08 addresses the **first-party** bounded surface only).
 
 ## 6a. Explicit non-claims (M07)
 
 M07 does **not**:
 
-- migrate **`image.py`** or change upstream Tasks API modules;
+- add the first-party **`AuroraImage`** surface (that is M08) or change upstream Tasks API modules;
 - add domain smoke tests, task bases, or kernel work;
 - claim that `SharedLibraryLoader` matches MediaPipe’s real loading graph or that a given path is valid on any host;
 - introduce discovery beyond the explicit constructor path (no env/config/package-resource search).
+
+## 6b. Explicit non-claims (M08)
+
+M08 does **not**:
+
+- modify or import upstream MediaPipe **`image.py`** / `mediapipe/` sources;
+- claim decode correctness, MediaPipe parity, or real native execution on CI;
+- add domain smoke tests, task bases, kernel extraction, or **`Dispatcher`** Protocol changes beyond the existing `dispatch` signature;
+- prove that operation tokens `aurora_image_from_file` / `aurora_image_from_bytes` map to any real native implementation.
 
 ---
 

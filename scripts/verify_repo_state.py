@@ -26,6 +26,7 @@ SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/dispatcher.py",
     "src/aurora/runtime/library_loader.py",
     "src/aurora/runtime/shared_library_loader.py",
+    "src/aurora/runtime/image.py",  # M08 — bounded image seam (structural presence only)
 )
 
 # Headings that M01 established as required continuity signals.

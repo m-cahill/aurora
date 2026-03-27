@@ -82,6 +82,22 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "    def __init__(self, path): ...\n"
             "    def shared_library(self): ...\n"
         ),
+        "src/aurora/runtime/image.py": (
+            '"""I."""\n'
+            "from __future__ import annotations\n"
+            "from dataclasses import dataclass\n"
+            "from typing import Any\n"
+            "from aurora.runtime.dispatcher import Dispatcher\n"
+            "from aurora.runtime.library_loader import LibraryLoader\n"
+            "class ImageCreationError(Exception):\n"
+            "    pass\n"
+            "@dataclass(frozen=True, slots=True)\n"
+            "class AuroraImage:\n"
+            "    dispatcher: Dispatcher\n"
+            "    library_loader: LibraryLoader\n"
+            "    native_handle: Any\n"
+            "    source_path: str | None = None\n"
+        ),
     }
 
 
