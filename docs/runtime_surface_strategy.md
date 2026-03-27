@@ -2,7 +2,7 @@
 
 **Status:** Canonical governance document (committed)  
 **Role:** Defines how a legitimate implementation surface may enter `aurora/` and what must exist before Phase B (runtime seam normalization) is authorized.  
-**Last updated:** 2026-03-26 (M05 — layout executed; see `docs/runtime_substrate.md`)
+**Last updated:** 2026-03-27 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`)
 
 This document is the **committed gate** for future runtime work. It does not establish runtime code by itself; it records an auditable decision the repo can execute against.
 
@@ -119,7 +119,7 @@ The alternative single package root under `aurora/` without `src/` was **not** u
 
 ## 6. Phase B entry contract
 
-Phase B is **not** authorized until the following are **all** true and recorded in `docs/aurora.md`:
+The following must **all** be true before **Phase B — Runtime Seam Normalization** is treated as authorized in `docs/aurora.md`:
 
 1. **M05 complete** — *Provenance-preserving runtime substrate establishment* closed with recorded commit SHA and honest CI.
 2. **Implementation surface present** — Importable package at `src/aurora/` with defined scope (`docs/runtime_substrate.md`), not only scripts and verifier tests.
@@ -127,7 +127,9 @@ Phase B is **not** authorized until the following are **all** true and recorded 
 4. **Minimal tripwires** — `unittest` checks **import** and **substrate metadata**; CI remains truthful (no false claims of MediaPipe correctness).
 5. **First Phase B milestone scope locked** — **M06** is the first Phase B milestone: smallest honest runtime-seam slice (dispatcher boundary formalization, `image.py` precondition framing, loader/async alignment only as justified — see milestone plan in workspace `docs/milestones/M06/M06_plan.md`).
 
-**Authorization rule:** **Phase B is explicitly authorized only when M05’s exit conditions are actually met** (including merge of M05 to **`main`** with green **`ci` / `repo-safety`**), not merely because a strategy or empty package exists.
+**Authorization rule:** **Phase B is authorized only when M05’s exit conditions are actually met** (including merge of M05 to **`main`** with green **`ci` / `repo-safety`**), not merely because a strategy or empty package exists.
+
+**Satisfied (M05):** Merged **`main`** **2026-03-27** — **PR #6**, merge commit **`04a5527c43c6e5cf64a0ec6beda45181f1c83efc`**, implementation **`107b49d476d9854df58527aa0b56eb6e134e88d3`**. Required check **`ci` / `repo-safety`** green on PR head and on post-merge **`main`** (run IDs in `docs/aurora.md` milestone ledger and workspace `M05_run1.md`). **Phase B is authorized.**
 
 ---
 
