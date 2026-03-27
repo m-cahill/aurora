@@ -164,7 +164,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 - Competition baseline **location, repo layout, and harness** (C01–C05 content)
 - Plugin/extension system and task discovery
 - Legacy Solutions deprecation timeline and migration guarantees
-- **Runtime seam normalization** (`Dispatcher`, `image.py`, loader/async) — **Phase B**; begins with **M06** when scoped (substrate package exists at `src/aurora/`)
+- **Further runtime seam work** (`image.py` migration off raw CDLL, concrete loaders, domain smoke tests) — **Phase B** after **M06** contract framing; see `docs/runtime_seam_framing.md` and `docs/runtime_surface_strategy.md`
 
 ---
 
@@ -186,6 +186,7 @@ Committed strategy and record in this repo:
 
 - `docs/runtime_surface_strategy.md` — **tracked runtime surface ingress, layout, Phase B entry contract** (M04; layout executed M05)
 - `docs/runtime_substrate.md` — **first-party substrate path, modules, provenance** (M05)
+- `docs/runtime_seam_framing.md` — **Phase B seam framing: `Dispatcher` / `LibraryLoader` contracts, `image.py` preconditions, LIVE_STREAM honesty** (M06)
 
 Authoritative narrative and evidence live outside this repo in the workspace, for example:
 

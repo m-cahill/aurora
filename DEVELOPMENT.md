@@ -55,7 +55,7 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md` and `docs/runtime_substrate.md` and references in `docs/aurora.md`, tracked substrate files under `src/aurora/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier and **runtime substrate** import/metadata tests (with **`PYTHONPATH=src`**);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
@@ -66,10 +66,15 @@ When green, CI indicates:
 - **`docs/runtime_substrate.md`** records provenance and explicit non-claims.
 - Tests assert **metadata contract** and **no `mediapipe` imports** in the new tree.
 
-### What M05 does not prove
+### M06 seam contracts (what they prove)
 
-- **Dispatcher** formalization, **`image.py`** migration, **`LibraryLoader`**, or Phase B seam normalization (see `docs/runtime_surface_strategy.md` and `docs/aurora.md`).
+- **`Dispatcher`** and **`LibraryLoader`** are available as minimal `typing.Protocol` definitions under `src/aurora/runtime/` (see `docs/runtime_seam_framing.md`).
+- CI and the verifier check **structural presence** and documentation cross-links — **not** native loading correctness, MediaPipe parity, or `image.py` migration (migration is explicitly out of scope for M06).
+
+### What M05 / M06 do not prove
+
 - **MediaPipe** or native runtime correctness — CI does not exercise upstream graphs or tasks.
+- Full **Dispatcher** implementations, **`image.py`** migration, or concrete **LibraryLoader** wiring — see `docs/runtime_surface_strategy.md`, `docs/runtime_seam_framing.md`, and `docs/aurora.md`.
 
 ## Protected `main` and pull requests
 

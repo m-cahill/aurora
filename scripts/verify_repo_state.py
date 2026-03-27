@@ -20,6 +20,12 @@ SUBSTRATE_REQUIRED_FILES = (
     "src/aurora/runtime/surface.py",
 )
 
+# M06: seam contract modules (structural presence only; not runtime validation).
+SEAM_CONTRACT_REQUIRED_FILES = (
+    "src/aurora/runtime/dispatcher.py",
+    "src/aurora/runtime/library_loader.py",
+)
+
 # Headings that M01 established as required continuity signals.
 REQUIRED_HEADING_SUBSTRINGS = (
     "Execution Phase Boundaries (locked)",
@@ -130,6 +136,11 @@ def _mediapipe_import_issues(repo_root: Path, tracked: list[str]) -> list[dict]:
 def _missing_substrate_files(tracked: list[str]) -> list[str]:
     tracked_set = set(tracked)
     return [f for f in SUBSTRATE_REQUIRED_FILES if f not in tracked_set]
+
+
+def _missing_seam_contract_files(tracked: list[str]) -> list[str]:
+    tracked_set = set(tracked)
+    return [f for f in SEAM_CONTRACT_REQUIRED_FILES if f not in tracked_set]
 
 
 def _scan_markdown_links(repo_root: Path, tracked: list[str]) -> list[dict]:
@@ -336,6 +347,11 @@ def verify_repository(repo_root: Path) -> int:
     checks.append({"id": "runtime_substrate_doc_exists", "ok": rsub_doc_ok})
     ok &= rsub_doc_ok
 
+    runtime_seam_framing = repo_root / "docs" / "runtime_seam_framing.md"
+    rsf_doc_ok = runtime_seam_framing.is_file()
+    checks.append({"id": "runtime_seam_framing_doc_exists", "ok": rsf_doc_ok})
+    ok &= rsf_doc_ok
+
     if readme_ok:
         readme_text = readme.read_text(encoding="utf-8")
         link_ok = _readme_links_to_canonical_doc(readme_text)
@@ -372,6 +388,15 @@ def verify_repository(repo_root: Path) -> int:
             }
         )
         ok &= ref_sub
+
+        ref_seam = "runtime_seam_framing.md" in body
+        checks.append(
+            {
+                "id": "canonical_doc_references_runtime_seam_framing",
+                "ok": ref_seam,
+            }
+        )
+        ok &= ref_seam
 
     env_hits = [
         p
@@ -415,6 +440,17 @@ def verify_repository(repo_root: Path) -> int:
         }
     )
     ok &= sub_files_ok
+
+    missing_seam = _missing_seam_contract_files(tracked)
+    seam_files_ok = not missing_seam
+    checks.append(
+        {
+            "id": "seam_contract_files_tracked",
+            "ok": seam_files_ok,
+            "missing": missing_seam,
+        }
+    )
+    ok &= seam_files_ok
 
     mp_import_issues = _mediapipe_import_issues(repo_root, tracked)
     mp_import_ok = not mp_import_issues

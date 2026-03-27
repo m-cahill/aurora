@@ -2,7 +2,7 @@
 
 **Status:** Canonical governance document (committed)  
 **Role:** Defines how a legitimate implementation surface may enter `aurora/` and what must exist before Phase B (runtime seam normalization) is authorized.  
-**Last updated:** 2026-03-27 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`)
+**Last updated:** 2026-03-27 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`). **M06 seam framing:** `docs/runtime_seam_framing.md`.
 
 This document is the **committed gate** for future runtime work. It does not establish runtime code by itself; it records an auditable decision the repo can execute against.
 
@@ -152,5 +152,6 @@ This strategy does **not** prove MediaPipe or application correctness. With M05,
 ## References
 
 - `docs/aurora.md` — Project record, phase boundaries, milestone ledger.
+- `docs/runtime_seam_framing.md` — **M06** — Contract-level `Dispatcher` / `LibraryLoader` framing, `image.py` preconditions, honest LIVE_STREAM semantics (what M06 proves and does not prove).
 - Workspace `docs/context/AURORA_VISION.md` — Vision (not committed in `aurora/`).
 - Workspace `docs/preflight/aurora_startup_lock/` — Startup locks and invariants.
