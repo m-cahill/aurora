@@ -267,6 +267,11 @@ def verify_repository(repo_root: Path) -> int:
     checks.append({"id": "canonical_doc_exists", "ok": canon_ok})
     ok &= canon_ok
 
+    runtime_strategy = repo_root / "docs" / "runtime_surface_strategy.md"
+    rs_doc_ok = runtime_strategy.is_file()
+    checks.append({"id": "runtime_surface_strategy_doc_exists", "ok": rs_doc_ok})
+    ok &= rs_doc_ok
+
     if readme_ok:
         readme_text = readme.read_text(encoding="utf-8")
         link_ok = _readme_links_to_canonical_doc(readme_text)
@@ -285,6 +290,15 @@ def verify_repository(repo_root: Path) -> int:
             }
         )
         ok &= heading_ok
+
+        ref_rs = "runtime_surface_strategy.md" in body
+        checks.append(
+            {
+                "id": "canonical_doc_references_runtime_surface_strategy",
+                "ok": ref_rs,
+            }
+        )
+        ok &= ref_rs
 
     env_hits = [
         p

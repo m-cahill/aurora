@@ -32,6 +32,8 @@ def _minimal_aurora_md() -> str:
 
 ## Program Roadmap (proposed)
 
+Governance: `docs/runtime_surface_strategy.md`.
+
 """
 
 
@@ -39,6 +41,14 @@ def _minimal_readme() -> str:
     return """# T
 
 [x](docs/aurora.md)
+"""
+
+
+def _minimal_runtime_surface_md() -> str:
+    return """# Runtime surface strategy
+
+Placeholder content for verifier fixtures.
+
 """
 
 
@@ -88,6 +98,7 @@ class TestVerifyRepoState(unittest.TestCase):
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -99,6 +110,39 @@ class TestVerifyRepoState(unittest.TestCase):
             root = Path(tmp)
             files = {
                 "README.md": _minimal_readme(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_runtime_surface_strategy_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_reference_to_runtime_surface_in_aurora_md_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            bad_aurora = """# A
+
+## Execution Phase Boundaries (locked)
+
+## Program Roadmap (proposed)
+
+"""
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": bad_aurora,
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -111,6 +155,7 @@ class TestVerifyRepoState(unittest.TestCase):
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": "# no headings\n",
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             _init_git_repo(root, files)
@@ -123,6 +168,7 @@ class TestVerifyRepoState(unittest.TestCase):
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
                 ".env": "SECRET=1\n",
             }
@@ -143,6 +189,7 @@ class TestVerifyRepoState(unittest.TestCase):
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": wf,
             }
             _init_git_repo(root, files)
@@ -163,6 +210,7 @@ jobs:
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": wf,
             }
             _init_git_repo(root, files)
@@ -175,6 +223,7 @@ jobs:
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(
                     uses_line="      - uses: actions/checkout@v4.2.2"
                 ),
@@ -190,6 +239,7 @@ jobs:
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(
                     uses_line=f"      - uses: actions/checkout@{short_sha}"
                 ),
@@ -212,6 +262,7 @@ jobs:
             files = {
                 "README.md": _minimal_readme(),
                 "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 ".github/workflows/ci.yml": wf,
             }
             _init_git_repo(root, files)
