@@ -73,6 +73,15 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "class LibraryLoader(Protocol):\n"
             "    def shared_library(self) -> Any: ...\n"
         ),
+        "src/aurora/runtime/shared_library_loader.py": (
+            '"""S."""\n'
+            "from __future__ import annotations\n"
+            "class SharedLibraryLoadError(Exception):\n"
+            "    pass\n"
+            "class SharedLibraryLoader:\n"
+            "    def __init__(self, path): ...\n"
+            "    def shared_library(self): ...\n"
+        ),
     }
 
 

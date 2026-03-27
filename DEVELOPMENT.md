@@ -55,7 +55,7 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/shared_library_loader.py` (M07)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier and **runtime substrate** import/metadata tests (with **`PYTHONPATH=src`**);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
@@ -71,10 +71,17 @@ When green, CI indicates:
 - **`Dispatcher`** and **`LibraryLoader`** are available as minimal `typing.Protocol` definitions under `src/aurora/runtime/` (see `docs/runtime_seam_framing.md`).
 - CI and the verifier check **structural presence** and documentation cross-links — **not** native loading correctness, MediaPipe parity, or `image.py` migration (migration is explicitly out of scope for M06).
 
-### What M05 / M06 do not prove
+### M07 concrete loader (what it proves)
+
+- **`SharedLibraryLoader`** (`src/aurora/runtime/shared_library_loader.py`) implements **`LibraryLoader`**: explicit constructor path, `ctypes.CDLL`-backed load, per-instance memoization of the handle (and of load failure), and **`SharedLibraryLoadError`** on `OSError`.
+- Unit tests patch **`ctypes.CDLL`** — they do **not** prove a real native library loads on the CI host.
+- **`image.py` migration** is still **out of scope**; M07 only provides the in-repo loader seam (see `docs/runtime_seam_framing.md`).
+
+### What M05 / M06 / M07 do not prove
 
 - **MediaPipe** or native runtime correctness — CI does not exercise upstream graphs or tasks.
-- Full **Dispatcher** implementations, **`image.py`** migration, or concrete **LibraryLoader** wiring — see `docs/runtime_surface_strategy.md`, `docs/runtime_seam_framing.md`, and `docs/aurora.md`.
+- Full **Dispatcher** implementations or **`image.py`** migration — see `docs/runtime_surface_strategy.md`, `docs/runtime_seam_framing.md`, and `docs/aurora.md`.
+- That any particular shared-library path is valid, safe, or compatible with MediaPipe — only that the **AURORA** loader wrapper behaves as documented when `CDLL` succeeds or fails.
 
 ## Protected `main` and pull requests
 

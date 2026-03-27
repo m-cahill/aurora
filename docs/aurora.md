@@ -2,8 +2,8 @@
 
 **Canonical anchor:** AURORA is the governed acoustic runtime and MediaPipe refactor program tracked in this repository; it is a Foundry-aligned case study and the substrate for PANTANAL-1, aimed at deterministic, artifact-bound, replayable audio execution without pretending the upstream monorepo is already well-governed.
 
-**Status:** Active — **M06** complete on **`main`**; **Phase A — Governance and Safety** is **closed**; **Phase B — Runtime Seam Normalization** is **authorized** (first slice **M06** delivered); **M07** next (see Milestone ledger)  
-**Last updated:** 2026-03-27 — **M06 closeout:** merged **PR #7**; merge commit **`0862c5bf96baa681d29a5283e0ca949588a86565`**; implementation head **`9eb2711a5d4de6b3d597a7d25b2c8105f56bf508`**; committed closeout **`17e8069cbfe67511c05e9bc216701f38096a2316`**; ledger update **`0a4c6c89dbc8f2826d17127f7ca5f472aa1eae15`**; **`ci` / `repo-safety`** green (PR **`23630086059`** / **`23630082135`**; post-merge **`main`** **`23631004105`**, **`23631039823`**, **`23631054922`**, **`23631078586`**, **`23631103294`**, **`23631124779`**). **Authoritative `main` tip after M06 closeout:** **`d5b0d78a8ff286e4264477b517226e24e0cce1cd`**. **Closeout recorded (UTC):** 2026-03-27T04:20:55Z (merge time).
+**Status:** Active — **M06** complete on **`main`**; **Phase A — Governance and Safety** is **closed**; **Phase B — Runtime Seam Normalization** is **authorized**; **M07** **implementation complete** on branch **`m07-concrete-loader`** — **PR / merge to `main` pending** (milestone **not** closed until merge + green **`ci` / `repo-safety`**); next tracked milestone: **M08** (stub in workspace `docs/milestones/M08/`).  
+**Last updated:** 2026-03-27 — **M07 implementation commit (pending merge):** **`aca63bab931f7b21d8cbf3f2fca20c4df1d2aa2d`** — **recorded (UTC):** **2026-03-27T19:38:48Z** — **branch tip** may include follow-up doc-only commits (see `git log m07-concrete-loader`). **M06 closeout:** merged **PR #7**; merge commit **`0862c5bf96baa681d29a5283e0ca949588a86565`**; **`ci` / `repo-safety`** green on M06 PR/post-merge (representative runs **`23630086059`**, **`23630082135`**, post-merge **`main`** **`23631153101`** on tip **`8c563a6f276aa942770cc034036fe33068dc8f2f`**). **Authoritative `main` tip before M07 PR:** **`8c563a6f276aa942770cc034036fe33068dc8f2f`**.
 
 This file is the **authoritative project record** for the `aurora/` git repository. It is maintained at milestone boundaries (especially closeout) so the repo stays legible, bounded, and aligned with evidence from audits and preflight locks.
 
@@ -105,7 +105,7 @@ These phases define **ordering and permission**, not dates. Work **must not** sk
 
 **Protected parallel competition rail:** BirdCLEF baseline and submission viability stay a **parallel** concern; refactor work must not eliminate the ability to produce a valid submission candidate.
 
-**Phase state (M06):** **Phase A — Governance and Safety** is **closed**. **Phase B — Runtime Seam Normalization** is **authorized**; **M06** (first Phase B slice) is **closed** on **`main`** (**PR #7**). Next: **M07** (workspace `docs/milestones/M07/M07_plan.md`; strategy `docs/runtime_surface_strategy.md` §4–§6).
+**Phase state (M07):** **Phase A — Governance and Safety** is **closed**. **Phase B — Runtime Seam Normalization** is **authorized**; **M06** is **closed** on **`main`** (**PR #7**). **M07** (`SharedLibraryLoader` concrete seam) is **implemented on branch `m07-concrete-loader`** — **awaiting PR merge** (see Milestone ledger). Next after merge: **M08** (workspace `docs/milestones/M08/M08_plan.md`).
 
 ---
 
@@ -129,11 +129,11 @@ This section is a **planning map** — a proposal aligned to the vision and PANT
 
 A separate **C01–C05** track is reserved for **baseline and submission safety** (credible BirdCLEF path, frozen candidates, compliance). It runs **alongside** refactor phases; integration points with AURORA runtime surfaces are **not** fixed in M01. Location, tooling, and repo structure for this rail remain **deferred**.
 
-### Next milestone (M07)
+### Next milestone (M08)
 
-**M06** is **closed** on **`main`** (**PR #7**, merge commit **`0862c5bf96baa681d29a5283e0ca949588a86565`**). It delivered **contract-level** `Dispatcher` / `LibraryLoader` protocols, **`docs/runtime_seam_framing.md`**, verifier/tests, and **`DEVELOPMENT.md`** alignment — **not** MediaPipe/native correctness, **`image.py` migration**, task bases, or kernel work (see ledger and `docs/runtime_seam_framing.md`).
+**M07** (branch **`m07-concrete-loader`**, authoritative plan workspace `docs/milestones/M07/M07_plan.md`) implements **`SharedLibraryLoader`** / **`SharedLibraryLoadError`** in **`src/aurora/runtime/shared_library_loader.py`**, updates **`docs/runtime_seam_framing.md`** and **`DEVELOPMENT.md`**, extends the verifier, and adds **`tests/test_library_loader_runtime.py`** (patched `ctypes.CDLL`). **Does not:** migrate **`image.py`**, add domain smoke tests, task bases, or kernel work — see `docs/runtime_seam_framing.md` §6a.
 
-**M07** is the next milestone (plan: workspace `docs/milestones/M07/M07_plan.md` when scoped).
+**M08** is next after **M07** **merge** to **`main`** (stub: workspace `docs/milestones/M08/M08_plan.md`).
 
 ---
 
@@ -164,7 +164,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 - Competition baseline **location, repo layout, and harness** (C01–C05 content)
 - Plugin/extension system and task discovery
 - Legacy Solutions deprecation timeline and migration guarantees
-- **Further runtime seam work** (`image.py` migration off raw CDLL, concrete loaders, domain smoke tests) — **Phase B** after **M06** contract framing; see `docs/runtime_seam_framing.md` and `docs/runtime_surface_strategy.md`
+- **Further runtime seam work** (`image.py` migration off raw CDLL, domain smoke tests) — **Phase B**; **M07** delivers the in-repo **concrete loader** only; see `docs/runtime_seam_framing.md` and `docs/runtime_surface_strategy.md`
 
 ---
 
@@ -178,6 +178,7 @@ A separate **C01–C05** track is reserved for **baseline and submission safety*
 | **M04** | Tracked runtime surface strategy and Phase B entry gate | **Complete** | 2026-03-26 | Governance only: **`docs/runtime_surface_strategy.md`**, **`docs/aurora.md`**, verifier + tests, **`DEVELOPMENT.md`**; **Phase A continues**; **Phase B** only after **M05** closes. | **PR #5** merged to `main` (**merge commit `e5125d93f96d9178feee2859b6b474090aa22721`**, merged **2026-03-27**). Implementation **`4702e9c2757c04582afb6c1e081c2c46b7b104a5`**; baseline **`13e0cded5a65d92dd0c2d75dd7b496fe36f8b6f2`**. Workflow **`ci`** / job **`repo-safety`** — authoritative PR run **`23625478660`** (**pull_request**, **success**). Post-merge `main` push run **`23625501522`** (**success**, merge commit **`e5125d9`**). Closeout commit **`bcead1349d262dd8b02af5df25f199badd9ed054`**; closeout `main` run **`23625512581`** (**success**). **No** `mediapipe/` edits in `aurora/`; **no** runtime seam code. **Closeout recorded (UTC):** 2026-03-27T00:55:00Z. |
 | **M05** | Provenance-preserving runtime substrate establishment and Phase A closeout gate | **Complete** | 2026-03-26 | First-party package **`src/aurora/`**, **`docs/runtime_substrate.md`**, substrate tests, CI (`PYTHONPATH=src`), verifier gates; **Phase A closed**; **Phase B authorized**; **M06** seeded. | **PR #6** → `main` (**merge `04a5527c43c6e5cf64a0ec6beda45181f1c83efc`**, merged **2026-03-27**); implementation **`107b49d476d9854df58527aa0b56eb6e134e88d3`**; baseline **`bbbbb9c246b76beb943c1d56168e8d0c503f8d77`**. **`ci` / `repo-safety`:** PR **`pull_request`** `23627396629`, **`push`** `23627394261`; post-merge **`main`** `23627411903`; closeout doc commit on **`main`** `23627439447` — **all success**. **No** `mediapipe/` imports under `src/aurora/`; **no** dispatcher / `image.py` / `LibraryLoader` implementation. **Closeout recorded (UTC):** 2026-03-27T01:59:27Z. |
 | **M06** | Dispatcher boundary formalization and runtime seam framing | **Complete** | 2026-03-26 | First **Phase B** slice: minimal **`Dispatcher`** / **`LibraryLoader`** `Protocol`s under **`src/aurora/runtime/`**, **`docs/runtime_seam_framing.md`**, verifier + tests, **`DEVELOPMENT.md`**; honest LIVE_STREAM / async wording; **not** `image.py` migration, task bases, kernel, or MediaPipe/native correctness. | **PR #7** → `main` (**merge `0862c5bf96baa681d29a5283e0ca949588a86565`**, merged **2026-03-27**); implementation **`9eb2711a5d4de6b3d597a7d25b2c8105f56bf508`**; baseline **`ed22eaf590d565da4619a1ee7a6f0d2632b978e6`**. **`ci` / `repo-safety`:** PR **`pull_request`** `23630086059`, **`push`** `23630082135`; post-merge **`main`** `23631004105` (merge commit); closeout project record on **`main`** **`17e8069cbfe67511c05e9bc216701f38096a2316`** — **`main`** run **`23631039823`** — **success**; ledger update on **`main`** **`0a4c6c89dbc8f2826d17127f7ca5f472aa1eae15`** — **`main`** run **`23631054922`** — **success**; final project record on **`main`** **`61b71a62307481feaf41d336c5a695e2d305778c`** — **`main`** run **`23631078586`** — **success**; authoritative `main` tip after closeout doc sequence **`fcec0d81923409b5ea57a73d17eb0fbe0503d317`** — **`main`** run **`23631103294`** — **success**; final ledger on **`main`** **`d5b0d78a8ff286e4264477b517226e24e0cce1cd`** — **`main`** run **`23631124779`** — **success**. **Proves:** contract-level seam formalization + governance tripwires. **Does not prove:** MediaPipe behavior, native dispatch/graph correctness, `image.py` migration, concrete loader wiring. **Closeout recorded (UTC):** 2026-03-27T04:20:55Z (merge time). |
+| **M07** | Concrete shared-library loader implementation and image-migration readiness | **Implementation complete — merge pending** | 2026-03-27 | Second **Phase B** slice: **`SharedLibraryLoader`** / **`SharedLibraryLoadError`** (`ctypes.CDLL`, explicit path, per-instance memoization), **`docs/runtime_seam_framing.md`** + **`DEVELOPMENT.md`**, verifier tracks **`shared_library_loader.py`**, **`tests/test_library_loader_runtime.py`** (patched `CDLL`); **not** `image.py` migration, domain smoke tests, task bases, kernel, or MediaPipe/native correctness. | **Branch `m07-concrete-loader`** @ **`aca63bab931f7b21d8cbf3f2fca20c4df1d2aa2d`** — **PR / merge to `main` pending**; **local proof:** `ruff check scripts tests src`, `PYTHONPATH=src python -m unittest discover -s tests -v`, `python scripts/verify_repo_state.py`, `python -m compileall -q scripts tests src`. **Proves (when merged):** concrete first-party loader satisfies **`LibraryLoader`**; singleton memoization + deterministic failure tested without real host libraries. **Does not prove:** MediaPipe compatibility, valid library path on any host, `image.py` wiring. **Closeout / merge / CI run IDs:** *pending merge*. **Recorded (UTC):** **2026-03-27T19:38:48Z** (implementation commit on branch). |
 
 ---
 
@@ -187,7 +188,7 @@ Committed strategy and record in this repo:
 
 - `docs/runtime_surface_strategy.md` — **tracked runtime surface ingress, layout, Phase B entry contract** (M04; layout executed M05)
 - `docs/runtime_substrate.md` — **first-party substrate path, modules, provenance** (M05)
-- `docs/runtime_seam_framing.md` — **Phase B seam framing: `Dispatcher` / `LibraryLoader` contracts, `image.py` preconditions, LIVE_STREAM honesty** (M06)
+- `docs/runtime_seam_framing.md` — **Phase B seam framing: `Dispatcher` / `LibraryLoader`, M07 `SharedLibraryLoader`, `image.py` preconditions, LIVE_STREAM honesty** (M06–M07)
 
 Authoritative narrative and evidence live outside this repo in the workspace, for example:
 
@@ -197,3 +198,4 @@ Authoritative narrative and evidence live outside this repo in the workspace, fo
 - `docs/preflight/aurora_startup_lock/` (startup locks and phase boundaries)
 
 When those documents change, **this file should be updated at milestone closeout** if the repo-level posture or roadmap needs to stay aligned.
+

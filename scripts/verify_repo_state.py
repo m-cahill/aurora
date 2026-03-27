@@ -21,9 +21,11 @@ SUBSTRATE_REQUIRED_FILES = (
 )
 
 # M06: seam contract modules (structural presence only; not runtime validation).
+# M07: concrete shared-library loader (implementation file; tracked for governance).
 SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/dispatcher.py",
     "src/aurora/runtime/library_loader.py",
+    "src/aurora/runtime/shared_library_loader.py",
 )
 
 # Headings that M01 established as required continuity signals.
