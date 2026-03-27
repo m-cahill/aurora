@@ -1,9 +1,9 @@
-# AURORA — Runtime seam framing (Phase B, M06)
+# AURORA — Runtime seam framing (Phase B, M06–M07)
 
-**Status:** Canonical committed framing (M06)  
-**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`image.py`** is as a precondition for later work, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
+**Status:** Canonical committed framing (M06 contracts; M07 concrete loader)  
+**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`image.py`** still needs for migration, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
 
-**Last updated:** 2026-03-26
+**Last updated:** 2026-03-27
 
 See also: `docs/runtime_surface_strategy.md` (ingress and Phase B entry contract), `docs/runtime_substrate.md` (package boundary), `docs/aurora.md` (project record).
 
@@ -19,6 +19,20 @@ M06 delivers **contract-level** seam formalization in the tracked `aurora/` repo
 - Verifier and doc cross-links so this surface stays **governed and auditable**.
 
 CI and tests remain **truthful**: green means **repo layout, substrate importability, seam contracts, and governance tripwires** — **not** MediaPipe correctness, native graph behavior, or full dispatch implementation.
+
+---
+
+## 1a. What M07 proves
+
+M07 adds a **minimal concrete** `SharedLibraryLoader` in `src/aurora/runtime/shared_library_loader.py` that implements the **`LibraryLoader`** protocol:
+
+- **Explicit path only** — the constructor takes `str | PathLike[str]`; no environment-variable lookup, package-resource search, or other discovery logic in M07.
+- **Per-instance memoization** — the first successful `shared_library()` call loads via `ctypes.CDLL` and caches the handle; subsequent calls on the **same instance** return the same object without calling `CDLL` again. Failed loads are also memoized so failure is deterministic.
+- **Documented failure surface** — `SharedLibraryLoadError` when `CDLL` raises `OSError`, with exception chaining preserved.
+
+**Tests** (with patched `ctypes.CDLL`, not real host libraries) cover protocol conformance, memoization, deterministic failure, and `aurora.runtime` exports.
+
+**What M07 does not prove:** MediaPipe compatibility, correct symbols for Tasks API, thread safety, `image.py` migration, or that any particular path is loadable on a given machine.
 
 ---
 
@@ -42,13 +56,13 @@ Audits identify a real constraint: a **single** `_shared_lib`-style handle (not 
 
 ## 4. `image.py` as a bounded outlier (preconditions only)
 
-Upstream, **`image.py`** is treated as a **bounded outlier** for raw `CDLL` / loading paths relative to other Tasks API modules. **M06 does not migrate `image.py`.** It only frames **preconditions** for a future, behavior-preserving migration:
+Upstream, **`image.py`** is treated as a **bounded outlier** for raw `CDLL` / loading paths relative to other Tasks API modules. **Neither M06 nor M07 migrates `image.py`.** Preconditions for a future, behavior-preserving migration now include:
 
-- A stable **loader** contract and documented singleton semantics (this milestone introduces the **contract** only).
+- A stable **loader** contract and documented singleton semantics (M06 **contract**; M07 **concrete** `SharedLibraryLoader` with explicit path and per-instance memoization — **not** upstream wiring).
 - A **Dispatcher** boundary that call sites can target without entangling raw CDLL details in every module.
-- Tests and evidence that a migration does not break import or dispatch assumptions.
+- Tests and evidence that a migration does not break import or dispatch assumptions (still **future** work).
 
-Until those preconditions are met in a **later** milestone, migration remains **out of scope** for M06.
+**M07** satisfies the “stable loader semantics” slice **inside** `aurora/`; **`image.py` migration** remains a **separate** milestone.
 
 ---
 
@@ -76,6 +90,15 @@ M06 does **not**:
 - copy or import MediaPipe source from the workspace clone;
 - claim MediaPipe or native-runtime correctness;
 - perform the actual **`image.py`** migration.
+
+## 6a. Explicit non-claims (M07)
+
+M07 does **not**:
+
+- migrate **`image.py`** or change upstream Tasks API modules;
+- add domain smoke tests, task bases, or kernel work;
+- claim that `SharedLibraryLoader` matches MediaPipe’s real loading graph or that a given path is valid on any host;
+- introduce discovery beyond the explicit constructor path (no env/config/package-resource search).
 
 ---
 

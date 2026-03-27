@@ -1,13 +1,14 @@
-"""Runtime package: substrate (M05) and seam contracts (M06).
+"""Runtime package: substrate (M05), seam contracts (M06), and concrete loader (M07).
 
-Phase B introduces minimal ``Dispatcher`` and ``LibraryLoader`` protocols only;
-they are typing contracts, not MediaPipe or native implementations.
+``Dispatcher`` / ``LibraryLoader`` are minimal ``typing.Protocol`` definitions.
+``SharedLibraryLoader`` is a first-party ``ctypes.CDLL`` wrapper — not MediaPipe.
 """
 
 from __future__ import annotations
 
 from .dispatcher import Dispatcher
 from .library_loader import LibraryLoader
+from .shared_library_loader import SharedLibraryLoader, SharedLibraryLoadError
 from .surface import (
     SUBSTRATE_CONTRACT_VERSION,
     RuntimeSubstrateMetadata,
@@ -20,4 +21,6 @@ __all__ = [
     "get_runtime_substrate_metadata",
     "Dispatcher",
     "LibraryLoader",
+    "SharedLibraryLoader",
+    "SharedLibraryLoadError",
 ]
