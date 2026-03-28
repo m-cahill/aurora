@@ -49,7 +49,7 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -v
 ```
 
-## Coverage (first-party `src/aurora` only; M11)
+## Coverage (first-party `src/aurora` only; M11 line + M12 branch)
 
 From the repository root, with dev tools installed (`pip install -r requirements-dev.txt`):
 
@@ -61,6 +61,7 @@ coverage erase
 coverage run -m unittest discover -s tests -v
 coverage report
 coverage json -o artifacts/coverage.json
+python scripts/check_coverage_thresholds.py
 ```
 
 **Windows (PowerShell):**
@@ -71,9 +72,12 @@ coverage erase
 coverage run -m unittest discover -s tests -v
 coverage report
 coverage json -o artifacts/coverage.json
+python scripts/check_coverage_thresholds.py
 ```
 
-Configuration is in **`.coveragerc`**: measurement is limited to **`src/aurora/`** (the first-party runtime package). Governance scripts such as `scripts/verify_repo_state.py` are **not** part of this coverage surface. The report enforces a **minimum line coverage** (`fail_under` in `.coveragerc`) so regressions fail locally and in CI.
+Configuration is in **`.coveragerc`**: measurement is limited to **`src/aurora/`** (the first-party runtime package), with **`branch = True`** so branch arcs are recorded. Governance scripts such as `scripts/verify_repo_state.py` are **not** part of this coverage surface.
+
+**Gates (M11 + M12):** Do not rely on **`report:fail_under`** in `.coveragerc` when branch coverage is enabled — coverage’s built-in fail-under uses a *combined* line+branch total. Instead, **`scripts/check_coverage_thresholds.py`** enforces **separate** floors: **line** (statement) coverage and **branch** (measured arcs) coverage, using totals from **`coverage json`**. Defaults are **100%** line and **100%** branch on the measured surface (see script constants).
 
 ## What CI proves (and what it does not)
 
@@ -84,7 +88,7 @@ When green, CI indicates:
 - repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/shared_library_loader.py` (M07)** and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
-- **line coverage** for **`src/aurora/`** via **`coverage run`** + **`coverage report`** (threshold from **`.coveragerc`**; JSON under **`artifacts/coverage.json`** on CI);
+- **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 
 ### M05 substrate (what it proves)

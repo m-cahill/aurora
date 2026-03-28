@@ -42,6 +42,7 @@ jobs:
           coverage run -m unittest discover -s tests -v 2>&1 | tee artifacts/unittest.txt
           coverage report
           coverage json -o artifacts/coverage.json
+          python scripts/check_coverage_thresholds.py
 
       - name: Upload CI artifacts
         if: always()
