@@ -31,4 +31,4 @@ class LibraryLoader(Protocol):
 
     def shared_library(self) -> Any:
         """Return the singleton shared-library handle for this process."""
-        ...
+        ...  # pragma: no cover — Protocol structural stub only

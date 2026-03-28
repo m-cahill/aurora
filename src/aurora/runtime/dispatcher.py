@@ -25,4 +25,4 @@ class Dispatcher(Protocol):
 
     def dispatch(self, *args: Any, **kwargs: Any) -> Any:
         """Invoke the native dispatch path; parameters are intentionally minimal."""
-        ...
+        ...  # pragma: no cover — Protocol structural stub only

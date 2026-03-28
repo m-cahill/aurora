@@ -1,2 +1,4 @@
 # M02 — exact pins for CI / local dev tools (support scripts only).
+# M11 — coverage for unittest runs (first-party src/aurora only; see .coveragerc).
+coverage==7.6.12
 ruff==0.15.7

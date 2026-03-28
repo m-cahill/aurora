@@ -49,6 +49,32 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s tests -v
 ```
 
+## Coverage (first-party `src/aurora` only; M11)
+
+From the repository root, with dev tools installed (`pip install -r requirements-dev.txt`):
+
+**Linux / macOS:**
+
+```bash
+export PYTHONPATH=src
+coverage erase
+coverage run -m unittest discover -s tests -v
+coverage report
+coverage json -o artifacts/coverage.json
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:PYTHONPATH = "src"
+coverage erase
+coverage run -m unittest discover -s tests -v
+coverage report
+coverage json -o artifacts/coverage.json
+```
+
+Configuration is in **`.coveragerc`**: measurement is limited to **`src/aurora/`** (the first-party runtime package). Governance scripts such as `scripts/verify_repo_state.py` are **not** part of this coverage surface. The report enforces a **minimum line coverage** (`fail_under` in `.coveragerc`) so regressions fail locally and in CI.
+
 ## What CI proves (and what it does not)
 
 The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `repo-safety`).
@@ -58,6 +84,7 @@ When green, CI indicates:
 - repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/shared_library_loader.py` (M07)** and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
+- **line coverage** for **`src/aurora/`** via **`coverage run`** + **`coverage report`** (threshold from **`.coveragerc`**; JSON under **`artifacts/coverage.json`** on CI);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 
 ### M05 substrate (what it proves)

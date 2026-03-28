@@ -35,10 +35,13 @@ jobs:
       - name: Compile scripts, tests, and runtime src
         run: python -m compileall -q scripts tests src && echo ok > artifacts/compileall_ok.txt
 
-      - name: Tests (unittest; PYTHONPATH=src for aurora package)
+      - name: Tests with coverage (unittest; first-party src/aurora)
         env:
           PYTHONPATH: src
-        run: python -m unittest discover -s tests -v 2>&1 | tee artifacts/unittest.txt
+        run: |
+          coverage run -m unittest discover -s tests -v 2>&1 | tee artifacts/unittest.txt
+          coverage report
+          coverage json -o artifacts/coverage.json
 
       - name: Upload CI artifacts
         if: always()

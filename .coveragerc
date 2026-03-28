@@ -1,0 +1,9 @@
+# M11 — first-party package coverage only (see DEVELOPMENT.md).
+# Governance scripts under scripts/ are intentionally out of scope.
+
+[run]
+source = src/aurora
+
+[report]
+precision = 1
+fail_under = 100
