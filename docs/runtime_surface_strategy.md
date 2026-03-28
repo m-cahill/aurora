@@ -2,7 +2,7 @@
 
 **Status:** Canonical governance document (committed)  
 **Role:** Defines how a legitimate implementation surface may enter `aurora/` and what must exist before Phase B (runtime seam normalization) is authorized.  
-**Last updated:** 2026-03-27 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`). **M06 seam framing:** `docs/runtime_seam_framing.md`.
+**Last updated:** 2026-03-27 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`). **M06 seam framing:** `docs/runtime_seam_framing.md`. **Phase B closeout:** §6a (**M10**).
 
 This document is the **committed gate** for future runtime work. It does not establish runtime code by itself; it records an auditable decision the repo can execute against.
 
@@ -130,6 +130,10 @@ The following must **all** be true before **Phase B — Runtime Seam Normalizati
 **Authorization rule:** **Phase B is authorized only when M05’s exit conditions are actually met** (including merge of M05 to **`main`** with green **`ci` / `repo-safety`**), not merely because a strategy or empty package exists.
 
 **Satisfied (M05):** Merged **`main`** **2026-03-27** — **PR #6**, merge commit **`04a5527c43c6e5cf64a0ec6beda45181f1c83efc`**, implementation **`107b49d476d9854df58527aa0b56eb6e134e88d3`**. Required check **`ci` / `repo-safety`** green on PR head and on post-merge **`main`** (run IDs in `docs/aurora.md` milestone ledger and workspace `M05_run1.md`). **Phase B is authorized.**
+
+## 6a. Phase B closeout (M10)
+
+The **first-wave** seam set in §4 is **satisfied** in the tracked repository by **M06**–**M09** on **`main`** (see `docs/aurora.md` milestone ledger; `docs/runtime_seam_framing.md`). **Upstream Tasks `image.py` / fork wiring** (in a MediaPipe fork) remains **deferred** and was **not** required for **Phase B** closure in **`aurora/`**. **Phase C — Abstraction and Deduplication** is **authorized**; the next substantive milestone is **M11** (workspace `docs/milestones/M11/`).
 
 ---
 
