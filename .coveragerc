@@ -1,9 +1,14 @@
-# M11 — first-party package coverage only (see DEVELOPMENT.md).
+# M11 — line floor; M12 — branch floor (see DEVELOPMENT.md).
 # Governance scripts under scripts/ are intentionally out of scope.
+#
+# Do not use ``report:fail_under`` here: with ``branch = True``, coverage’s
+# built-in fail-under applies to the *combined* (line+branch) ratio, not line
+# alone. Line and branch regression floors are enforced separately by
+# ``scripts/check_coverage_thresholds.py`` after ``coverage json``.
 
 [run]
 source = src/aurora
+branch = True
 
 [report]
 precision = 1
-fail_under = 100
