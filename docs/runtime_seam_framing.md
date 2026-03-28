@@ -1,7 +1,7 @@
-# AURORA — Runtime seam framing (Phase B, M06–M08)
+# AURORA — Runtime seam framing (Phase B, M06–M09)
 
-**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam)  
-**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
+**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam; M09 composed runtime smoke tests)  
+**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), what **M09 smoke tests** prove at the composed seam layer, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
 
 **Last updated:** 2026-03-27
 
@@ -46,6 +46,20 @@ M08 adds a **bounded** first-party image seam in `src/aurora/runtime/image.py`:
 - **Verifier** tracks `image.py` structurally; **tests** use fakes (no real host libraries).
 
 **What M08 does not prove:** Upstream MediaPipe `vision` / Tasks **`image.py`** parity, correct decoding of any file format, native graph correctness, domain smoke coverage, task bases, or kernel work.
+
+---
+
+## 1c. What M09 proves (composed runtime smoke)
+
+M09 adds **`tests/test_runtime_smoke.py`**: a **smoke-style** layer **above** M07/M08 unit tests. It exercises the **composed** first-party chain:
+
+- Real **`SharedLibraryLoader`** with **`ctypes.CDLL` patched** (no real host libraries, deterministic).
+- Real **`AuroraImage`** (`from_file` / `from_bytes`).
+- A **recording fake `Dispatcher`** (not a real upstream or native dispatcher).
+
+Together this demonstrates **`AuroraImage` → `SharedLibraryLoader` → patched `CDLL`** and **`AuroraImage` → `Dispatcher.dispatch(...)`** end-to-end for bounded happy paths, plus **loader** and **dispatch** failure paths surfaced as **`ImageCreationError`** with exception chaining preserved.
+
+**What M09 does not prove:** MediaPipe parity, decode correctness, real native execution on CI, that operation tokens map to any real implementation, upstream Tasks **`image.py`** migration, task bases, kernel work, or placeholder coverage for domains without a first-party surface (for example audio/text).
 
 ---
 
@@ -119,6 +133,15 @@ M08 does **not**:
 - claim decode correctness, MediaPipe parity, or real native execution on CI;
 - add domain smoke tests, task bases, kernel extraction, or **`Dispatcher`** Protocol changes beyond the existing `dispatch` signature;
 - prove that operation tokens `aurora_image_from_file` / `aurora_image_from_bytes` map to any real native implementation.
+
+## 6c. Explicit non-claims (M09)
+
+M09 does **not**:
+
+- claim MediaPipe parity, decode correctness, or real native execution on CI;
+- modify upstream Tasks **`image.py`** or workspace **`mediapipe/`**;
+- wire dispatch tokens to real native implementations;
+- add task bases, kernel extraction, or placeholder smoke tests for domains without a current first-party surface.
 
 ---
 
