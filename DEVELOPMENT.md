@@ -57,7 +57,7 @@ When green, CI indicates:
 
 - repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/shared_library_loader.py` (M07)** and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
-- **stdlib `unittest`** for the verifier and **runtime substrate** import/metadata tests (with **`PYTHONPATH=src`**);
+- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 
 ### M05 substrate (what it proves)
@@ -82,9 +82,15 @@ When green, CI indicates:
 - **`AuroraImage`** / **`ImageCreationError`** in `src/aurora/runtime/image.py`: `from_file` / `from_bytes` route through injected **`Dispatcher`** and **`LibraryLoader`**; **`image.py` does not call `ctypes` or `CDLL`** (only the loader seam loads native code).
 - Unit tests use **fakes** — they do **not** prove decode correctness, MediaPipe parity, or real native execution.
 
-### What M05 / M06 / M07 / M08 do not prove
+### M09 composed runtime smoke (what it proves)
+
+- **`tests/test_runtime_smoke.py`** exercises the **composed** first-party seam chain: real **`SharedLibraryLoader`** with **`ctypes.CDLL` patched** (no real host libraries), real **`AuroraImage`**, and a **recording fake `Dispatcher`** — happy paths (`from_file` / `from_bytes`) plus loader and dispatch failure paths surfaced as **`ImageCreationError`** with chaining preserved.
+- This is **not** duplicate M08 unit coverage: smoke tests prove **`AuroraImage` → `SharedLibraryLoader` → patched `CDLL`** together with **`Dispatcher.dispatch`**, not isolated fakes alone.
+
+### What M05 / M06 / M07 / M08 / M09 do not prove
 
 - **MediaPipe** or native runtime correctness — CI does not exercise upstream graphs or tasks.
+- **Decode correctness**, **MediaPipe parity**, or **real native execution** on the CI host — M09 smoke tests remain **fake-backed**; dispatch tokens are **conventions** until wired to a real implementation elsewhere.
 - Upstream Tasks **`image.py`** migration inside a fork — M08 is the **in-repo** bounded surface only; see `docs/runtime_seam_framing.md` and `docs/aurora.md`.
 - That any particular shared-library path is valid, safe, or compatible with MediaPipe — only that the **AURORA** loader wrapper behaves as documented when `CDLL` succeeds or fails.
 
