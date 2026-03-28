@@ -2,7 +2,7 @@
 
 **Status:** Canonical governance document (committed)  
 **Role:** Defines how a legitimate implementation surface may enter `aurora/` and what must exist before Phase B (runtime seam normalization) is authorized.  
-**Last updated:** 2026-03-27 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`). **M06 seam framing:** `docs/runtime_seam_framing.md`. **Phase B closeout:** §6a (**M10**).
+**Last updated:** 2026-03-28 (M05 merged to `main` — §6 satisfied; Phase B authorized; see `docs/aurora.md`). **M06 seam framing:** `docs/runtime_seam_framing.md`. **Phase B closeout:** §6a — **M10** merged **2026-03-28** (**PR #11**, merge **`7670b0b684727d36c692bee50aaa30fd672e56db`**; see `docs/aurora.md`).
 
 This document is the **committed gate** for future runtime work. It does not establish runtime code by itself; it records an auditable decision the repo can execute against.
 
@@ -133,7 +133,7 @@ The following must **all** be true before **Phase B — Runtime Seam Normalizati
 
 ## 6a. Phase B closeout (M10)
 
-The **first-wave** seam set in §4 is **satisfied** in the tracked repository by **M06**–**M09** on **`main`** (see `docs/aurora.md` milestone ledger; `docs/runtime_seam_framing.md`). **Upstream Tasks `image.py` / fork wiring** (in a MediaPipe fork) remains **deferred** and was **not** required for **Phase B** closure in **`aurora/`**. **Phase C — Abstraction and Deduplication** is **authorized**; the next substantive milestone is **M11** (workspace `docs/milestones/M11/`).
+The **first-wave** seam set in §4 is **satisfied** in the tracked repository by **M06**–**M09** on **`main`** (see `docs/aurora.md` milestone ledger; `docs/runtime_seam_framing.md`). **Phase B** is **closed** at **M10** (governance milestone **PR #11**, merge commit **`7670b0b684727d36c692bee50aaa30fd672e56db`**, **2026-03-28**). **Upstream Tasks `image.py` / fork wiring** (in a MediaPipe fork) remains **deferred** and was **not** required for **Phase B** closure in **`aurora/`**. **Phase C — Abstraction and Deduplication** is **authorized**; the next substantive milestone is **M11** (workspace `docs/milestones/M11/`).
 
 ---
 
