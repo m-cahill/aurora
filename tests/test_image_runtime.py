@@ -73,6 +73,7 @@ class TestAuroraImageRuntime(unittest.TestCase):
         self.assertIsNone(img.source_path)
 
     def test_loader_failure_is_image_creation_error_with_chain(self) -> None:
+        from aurora.runtime.errors import AuroraRuntimeError  # noqa: PLC0415
         from aurora.runtime.image import (  # noqa: PLC0415
             AuroraImage,
             ImageCreationError,
@@ -82,10 +83,28 @@ class TestAuroraImageRuntime(unittest.TestCase):
         loader = _FakeLoader(fail=True)
         with self.assertRaises(ImageCreationError) as ctx:
             AuroraImage.from_file("nope", disp, loader)
+        self.assertIsInstance(ctx.exception, AuroraRuntimeError)
         self.assertIsInstance(ctx.exception.__cause__, OSError)
         self.assertEqual(disp.calls, [])
 
+    def test_loader_failure_from_bytes_is_image_creation_error_with_chain(self) -> None:
+        from aurora.runtime.errors import AuroraRuntimeError  # noqa: PLC0415
+        from aurora.runtime.image import (  # noqa: PLC0415
+            AuroraImage,
+            ImageCreationError,
+        )
+
+        disp = _FakeDispatcher()
+        loader = _FakeLoader(fail=True)
+        with self.assertRaises(ImageCreationError) as ctx:
+            AuroraImage.from_bytes(b"x", disp, loader)
+        self.assertIsInstance(ctx.exception, AuroraRuntimeError)
+        self.assertIsInstance(ctx.exception.__cause__, OSError)
+        self.assertEqual(str(ctx.exception), "Failed to create image from bytes")
+        self.assertEqual(disp.calls, [])
+
     def test_dispatch_failure_is_image_creation_error_with_chain(self) -> None:
+        from aurora.runtime.errors import AuroraRuntimeError  # noqa: PLC0415
         from aurora.runtime.image import (  # noqa: PLC0415
             AuroraImage,
             ImageCreationError,
@@ -99,6 +118,7 @@ class TestAuroraImageRuntime(unittest.TestCase):
         loader = _FakeLoader()
         with self.assertRaises(ImageCreationError) as ctx:
             AuroraImage.from_file("p", disp, loader)
+        self.assertIsInstance(ctx.exception, AuroraRuntimeError)
         self.assertIsInstance(ctx.exception.__cause__, RuntimeError)
 
     def test_image_module_has_no_raw_cdll(self) -> None:

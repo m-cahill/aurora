@@ -85,7 +85,7 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/shared_library_loader.py` (M07)** and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
@@ -117,6 +117,17 @@ When green, CI indicates:
 
 - **`tests/test_runtime_smoke.py`** exercises the **composed** first-party seam chain: real **`SharedLibraryLoader`** with **`ctypes.CDLL` patched** (no real host libraries), real **`AuroraImage`**, and a **recording fake `Dispatcher`** — happy paths (`from_file` / `from_bytes`) plus loader and dispatch failure paths surfaced as **`ImageCreationError`** with chaining preserved.
 - This is **not** duplicate M08 unit coverage: smoke tests prove **`AuroraImage` → `SharedLibraryLoader` → patched `CDLL`** together with **`Dispatcher.dispatch`**, not isolated fakes alone.
+
+### M13 runtime surface coherence (what it proves)
+
+- **`src/aurora/runtime/errors.py`** defines **`AuroraRuntimeError`**, a **shared internal base** for first-party seam exceptions. **`SharedLibraryLoadError`** and **`ImageCreationError`** subclass it; **public exception names, messages, and `raise … from …` chaining** match M07/M08 behavior.
+- **`AuroraImage`** uses a **private** `_from_dispatch` helper so `from_file` / `from_bytes` share one implementation path; **no new public API** was added for that helper.
+- **`AuroraRuntimeError`** is **internal** to the runtime package (not re-exported from `aurora.runtime.__all__`); callers continue to catch **`ImageCreationError`** / **`SharedLibraryLoadError`** as before.
+
+### M13 non-goals (explicit)
+
+- **No shared lifecycle or resource-management abstraction** was introduced: M13 **inspected** the current seam modules for reusable lifecycle/cleanup patterns and found **insufficient real duplication** to justify extraction at this time.
+- **No** `VisionTaskBase` / `AudioTaskBase`, upstream Tasks wrappers, kernel work, or artifact/runtime behavior.
 
 ### What M05 / M06 / M07 / M08 / M09 do not prove
 

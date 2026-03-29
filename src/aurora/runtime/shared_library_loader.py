@@ -20,8 +20,10 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .errors import AuroraRuntimeError
 
-class SharedLibraryLoadError(Exception):
+
+class SharedLibraryLoadError(AuroraRuntimeError):
     """Raised when ``ctypes.CDLL`` cannot load the configured library path."""
 
     def __init__(self, path: str) -> None:
