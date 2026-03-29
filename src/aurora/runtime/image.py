@@ -12,11 +12,12 @@ particular native symbol set — only governed seam routing in-repo.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from .dispatch_tokens import IMAGE_FROM_BYTES, IMAGE_FROM_FILE
 from .dispatcher import Dispatcher
 from .errors import AuroraRuntimeError
+from .image_dispatch import dispatch_image_from_bytes, dispatch_image_from_file
 from .library_loader import LibraryLoader
 
 
@@ -53,9 +54,17 @@ class AuroraImage:
         failure_message: str,
     ) -> AuroraImage:
         """Shared path for ``from_file`` / ``from_bytes`` (private; not public API)."""
+        if token not in (IMAGE_FROM_FILE, IMAGE_FROM_BYTES):
+            raise AssertionError(f"unexpected AuroraImage dispatch token: {token!r}")
         try:
-            lib = library_loader.shared_library()
-            handle = dispatcher.dispatch(token, dispatch_arg, lib)
+            if token == IMAGE_FROM_FILE:
+                handle = dispatch_image_from_file(
+                    dispatcher, library_loader, cast(str, dispatch_arg)
+                )
+            else:
+                handle = dispatch_image_from_bytes(
+                    dispatcher, library_loader, cast(bytes, dispatch_arg)
+                )
         except Exception as exc:
             err = ImageCreationError(failure_message)
             raise err from exc

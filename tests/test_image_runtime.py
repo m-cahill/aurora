@@ -53,6 +53,46 @@ class TestDispatchTokenValues(unittest.TestCase):
         self.assertEqual(IMAGE_FROM_BYTES, "aurora_image_from_bytes")
 
 
+class TestImageDispatchInvocationContract(unittest.TestCase):
+    """M15 — pin dispatch call-shape at ``image_dispatch`` helpers (internal)."""
+
+    def test_dispatch_image_from_file_shape(self) -> None:
+        from aurora.runtime.dispatch_tokens import IMAGE_FROM_FILE  # noqa: PLC0415
+        from aurora.runtime.image_dispatch import (  # noqa: PLC0415
+            dispatch_image_from_file,
+        )
+
+        disp = _FakeDispatcher()
+        loader = _FakeLoader()
+        handle = dispatch_image_from_file(disp, loader, "/tmp/a.bin")
+        self.assertEqual(loader.calls, 1)
+        self.assertEqual(len(disp.calls), 1)
+        args, kwargs = disp.calls[0]
+        self.assertEqual(kwargs, {})
+        self.assertEqual(args[0], IMAGE_FROM_FILE)
+        self.assertEqual(args[1], "/tmp/a.bin")
+        self.assertIs(args[2], loader._handle)
+        self.assertEqual(handle, ("ok", args))
+
+    def test_dispatch_image_from_bytes_shape(self) -> None:
+        from aurora.runtime.dispatch_tokens import IMAGE_FROM_BYTES  # noqa: PLC0415
+        from aurora.runtime.image_dispatch import (  # noqa: PLC0415
+            dispatch_image_from_bytes,
+        )
+
+        disp = _FakeDispatcher()
+        loader = _FakeLoader()
+        raw = b"\x00\x01"
+        handle = dispatch_image_from_bytes(disp, loader, raw)
+        self.assertEqual(loader.calls, 1)
+        args, kwargs = disp.calls[0]
+        self.assertEqual(kwargs, {})
+        self.assertEqual(args[0], IMAGE_FROM_BYTES)
+        self.assertEqual(args[1], raw)
+        self.assertIs(args[2], loader._handle)
+        self.assertEqual(handle, ("ok", args))
+
+
 class TestAuroraImageRuntime(unittest.TestCase):
     def test_from_file_routes_through_dispatcher_and_loader(self) -> None:
         from aurora.runtime.dispatch_tokens import IMAGE_FROM_FILE  # noqa: PLC0415
@@ -135,6 +175,21 @@ class TestAuroraImageRuntime(unittest.TestCase):
             AuroraImage.from_file("p", disp, loader)
         self.assertIsInstance(ctx.exception, AuroraRuntimeError)
         self.assertIsInstance(ctx.exception.__cause__, RuntimeError)
+
+    def test_unknown_dispatch_token_raises_assertion(self) -> None:
+        from aurora.runtime.image import AuroraImage  # noqa: PLC0415
+
+        disp = _FakeDispatcher()
+        loader = _FakeLoader()
+        with self.assertRaises(AssertionError):
+            AuroraImage._from_dispatch(
+                dispatcher=disp,
+                library_loader=loader,
+                source_path=None,
+                token="not_a_real_token",
+                dispatch_arg=b"x",
+                failure_message="x",
+            )
 
     def test_image_module_has_no_raw_cdll(self) -> None:
         spec = importlib.util.find_spec("aurora.runtime.image")
