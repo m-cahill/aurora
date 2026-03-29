@@ -45,6 +45,7 @@ class _BoomDispatcher:
 
 class TestRuntimeSmokeComposition(unittest.TestCase):
     def test_smoke_happy_path_from_file_composes_loader_and_dispatcher(self) -> None:
+        from aurora.runtime.dispatch_tokens import IMAGE_FROM_FILE  # noqa: PLC0415
         from aurora.runtime.image import AuroraImage  # noqa: PLC0415
         from aurora.runtime.shared_library_loader import SharedLibraryLoader  # noqa: PLC0415
 
@@ -68,11 +69,12 @@ class TestRuntimeSmokeComposition(unittest.TestCase):
         self.assertEqual(len(disp.calls), 1)
         args, kwargs = disp.calls[0]
         self.assertEqual(kwargs, {})
-        self.assertEqual(args[0], "aurora_image_from_file")
+        self.assertEqual(args[0], IMAGE_FROM_FILE)
         self.assertEqual(args[1], str(lib_path))
         self.assertIs(args[2], fake_cdll)
 
     def test_smoke_happy_path_from_bytes_composes_loader_and_dispatcher(self) -> None:
+        from aurora.runtime.dispatch_tokens import IMAGE_FROM_BYTES  # noqa: PLC0415
         from aurora.runtime.image import AuroraImage  # noqa: PLC0415
         from aurora.runtime.shared_library_loader import SharedLibraryLoader  # noqa: PLC0415
 
@@ -93,7 +95,7 @@ class TestRuntimeSmokeComposition(unittest.TestCase):
         self.assertIsNone(img.source_path)
         self.assertEqual(len(disp.calls), 1)
         args, _kwargs = disp.calls[0]
-        self.assertEqual(args[0], "aurora_image_from_bytes")
+        self.assertEqual(args[0], IMAGE_FROM_BYTES)
         self.assertEqual(args[1], raw)
         self.assertIs(args[2], fake_cdll)
 
