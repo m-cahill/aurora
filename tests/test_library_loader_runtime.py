@@ -46,6 +46,7 @@ class TestSharedLibraryLoaderRuntime(unittest.TestCase):
         cdll.assert_called_once()
 
     def test_load_failure_is_deterministic(self) -> None:
+        from aurora.runtime.errors import AuroraRuntimeError  # noqa: PLC0415
         from aurora.runtime.shared_library_loader import (  # noqa: PLC0415
             SharedLibraryLoader,
             SharedLibraryLoadError,
@@ -66,6 +67,7 @@ class TestSharedLibraryLoaderRuntime(unittest.TestCase):
             second = ctx2.exception
         self.assertIs(first, second)
         self.assertIsInstance(first, SharedLibraryLoadError)
+        self.assertIsInstance(first, AuroraRuntimeError)
         self.assertIs(first.__cause__, boom)
 
     def test_runtime_package_exports(self) -> None:

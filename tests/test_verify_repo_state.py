@@ -73,10 +73,17 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "class LibraryLoader(Protocol):\n"
             "    def shared_library(self) -> Any: ...\n"
         ),
+        "src/aurora/runtime/errors.py": (
+            '"""E."""\n'
+            "from __future__ import annotations\n\n"
+            "class AuroraRuntimeError(Exception):\n"
+            "    pass\n"
+        ),
         "src/aurora/runtime/shared_library_loader.py": (
             '"""S."""\n'
             "from __future__ import annotations\n"
-            "class SharedLibraryLoadError(Exception):\n"
+            "from aurora.runtime.errors import AuroraRuntimeError\n"
+            "class SharedLibraryLoadError(AuroraRuntimeError):\n"
             "    pass\n"
             "class SharedLibraryLoader:\n"
             "    def __init__(self, path): ...\n"
@@ -88,8 +95,9 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "from dataclasses import dataclass\n"
             "from typing import Any\n"
             "from aurora.runtime.dispatcher import Dispatcher\n"
+            "from aurora.runtime.errors import AuroraRuntimeError\n"
             "from aurora.runtime.library_loader import LibraryLoader\n"
-            "class ImageCreationError(Exception):\n"
+            "class ImageCreationError(AuroraRuntimeError):\n"
             "    pass\n"
             "@dataclass(frozen=True, slots=True)\n"
             "class AuroraImage:\n"

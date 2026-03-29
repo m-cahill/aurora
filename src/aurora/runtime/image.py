@@ -15,10 +15,11 @@ from dataclasses import dataclass
 from typing import Any
 
 from .dispatcher import Dispatcher
+from .errors import AuroraRuntimeError
 from .library_loader import LibraryLoader
 
 
-class ImageCreationError(Exception):
+class ImageCreationError(AuroraRuntimeError):
     """Raised when bounded image creation fails (loader or dispatch path).
 
     Chains the underlying exception when one is available (mirrors
@@ -40,6 +41,31 @@ class AuroraImage:
     source_path: str | None = None
 
     @classmethod
+    def _from_dispatch(
+        cls,
+        *,
+        dispatcher: Dispatcher,
+        library_loader: LibraryLoader,
+        source_path: str | None,
+        token: str,
+        dispatch_arg: str | bytes,
+        failure_message: str,
+    ) -> AuroraImage:
+        """Shared path for ``from_file`` / ``from_bytes`` (private; not public API)."""
+        try:
+            lib = library_loader.shared_library()
+            handle = dispatcher.dispatch(token, dispatch_arg, lib)
+        except Exception as exc:
+            err = ImageCreationError(failure_message)
+            raise err from exc
+        return cls(
+            dispatcher=dispatcher,
+            library_loader=library_loader,
+            native_handle=handle,
+            source_path=source_path,
+        )
+
+    @classmethod
     def from_file(
         cls,
         path: str,
@@ -51,17 +77,13 @@ class AuroraImage:
         Operation token passed to ``dispatch`` is ``\"aurora_image_from_file\"``
         with arguments ``(path, shared_library_handle)``.
         """
-        try:
-            lib = library_loader.shared_library()
-            handle = dispatcher.dispatch("aurora_image_from_file", path, lib)
-        except Exception as exc:
-            err = ImageCreationError(f"Failed to create image from file {path!r}")
-            raise err from exc
-        return cls(
+        return cls._from_dispatch(
             dispatcher=dispatcher,
             library_loader=library_loader,
-            native_handle=handle,
             source_path=path,
+            token="aurora_image_from_file",
+            dispatch_arg=path,
+            failure_message=f"Failed to create image from file {path!r}",
         )
 
     @classmethod
@@ -76,17 +98,13 @@ class AuroraImage:
         Operation token passed to ``dispatch`` is ``\"aurora_image_from_bytes\"``
         with arguments ``(data, shared_library_handle)``.
         """
-        try:
-            lib = library_loader.shared_library()
-            handle = dispatcher.dispatch("aurora_image_from_bytes", data, lib)
-        except Exception as exc:
-            err = ImageCreationError("Failed to create image from bytes")
-            raise err from exc
-        return cls(
+        return cls._from_dispatch(
             dispatcher=dispatcher,
             library_loader=library_loader,
-            native_handle=handle,
             source_path=None,
+            token="aurora_image_from_bytes",
+            dispatch_arg=data,
+            failure_message="Failed to create image from bytes",
         )
 
 
