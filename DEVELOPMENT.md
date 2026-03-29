@@ -85,7 +85,7 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
@@ -138,6 +138,16 @@ When green, CI indicates:
 
 - **No** new operations, domains, or **`Dispatcher`** / **`LibraryLoader`** protocol changes.
 - **No** `VisionTaskBase` / `AudioTaskBase`, lifecycle extraction, logging migration, or upstream Tasks migration.
+
+### M15 AuroraImage dispatch invocation contract (what it proves)
+
+- **`src/aurora/runtime/image_dispatch.py`** is the **single source of truth** for how **`AuroraImage`** acquires the shared-library handle and invokes **`Dispatcher.dispatch`** with the M14 tokens and frozen positional order **(token, payload, library handle)**. Helpers **`dispatch_image_from_file`** / **`dispatch_image_from_bytes`** return the opaque native handle only; **`ImageCreationError`** wrapping and **`AuroraImage`** construction remain in **`image.py`** (private **`_from_dispatch`** unchanged in role).
+- The module is **internal** (not re-exported from `aurora.runtime.__all__`). **`scripts/verify_repo_state.py`** requires the file as part of the tracked seam set. Unittests pin token values (M14) and dispatch argument ordering (M08/M14/M15).
+
+### M15 non-goals (explicit)
+
+- **No** new public runtime API, **`Dispatcher`** / **`LibraryLoader`** protocol changes, or token value changes.
+- **No** `VisionTaskBase` / `AudioTaskBase`, lifecycle extraction, logging migration, kernel work, or upstream Tasks migration.
 
 ### What M05 / M06 / M07 / M08 / M09 do not prove
 
