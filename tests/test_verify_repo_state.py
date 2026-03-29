@@ -79,6 +79,12 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "class AuroraRuntimeError(Exception):\n"
             "    pass\n"
         ),
+        "src/aurora/runtime/dispatch_tokens.py": (
+            '"""T."""\n'
+            "from __future__ import annotations\n\n"
+            "IMAGE_FROM_FILE = \"aurora_image_from_file\"\n"
+            "IMAGE_FROM_BYTES = \"aurora_image_from_bytes\"\n"
+        ),
         "src/aurora/runtime/shared_library_loader.py": (
             '"""S."""\n'
             "from __future__ import annotations\n"

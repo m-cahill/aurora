@@ -40,8 +40,22 @@ class _FakeLoader:
         return self._handle
 
 
+class TestDispatchTokenValues(unittest.TestCase):
+    """M14 — pin exact dispatch token strings (behavior surface)."""
+
+    def test_image_dispatch_tokens_match_legacy_literals(self) -> None:
+        from aurora.runtime.dispatch_tokens import (  # noqa: PLC0415
+            IMAGE_FROM_BYTES,
+            IMAGE_FROM_FILE,
+        )
+
+        self.assertEqual(IMAGE_FROM_FILE, "aurora_image_from_file")
+        self.assertEqual(IMAGE_FROM_BYTES, "aurora_image_from_bytes")
+
+
 class TestAuroraImageRuntime(unittest.TestCase):
     def test_from_file_routes_through_dispatcher_and_loader(self) -> None:
+        from aurora.runtime.dispatch_tokens import IMAGE_FROM_FILE  # noqa: PLC0415
         from aurora.runtime.image import AuroraImage  # noqa: PLC0415
 
         disp = _FakeDispatcher()
@@ -51,7 +65,7 @@ class TestAuroraImageRuntime(unittest.TestCase):
         self.assertEqual(len(disp.calls), 1)
         args, kwargs = disp.calls[0]
         self.assertEqual(kwargs, {})
-        self.assertEqual(args[0], "aurora_image_from_file")
+        self.assertEqual(args[0], IMAGE_FROM_FILE)
         self.assertEqual(args[1], "/tmp/x.bin")
         self.assertIs(args[2], loader._handle)
         self.assertEqual(img.source_path, "/tmp/x.bin")
@@ -59,6 +73,7 @@ class TestAuroraImageRuntime(unittest.TestCase):
         self.assertIs(img.library_loader, loader)
 
     def test_from_bytes_routes_through_dispatcher_and_loader(self) -> None:
+        from aurora.runtime.dispatch_tokens import IMAGE_FROM_BYTES  # noqa: PLC0415
         from aurora.runtime.image import AuroraImage  # noqa: PLC0415
 
         disp = _FakeDispatcher()
@@ -67,7 +82,7 @@ class TestAuroraImageRuntime(unittest.TestCase):
         img = AuroraImage.from_bytes(raw, disp, loader)
         self.assertEqual(loader.calls, 1)
         args, _kwargs = disp.calls[0]
-        self.assertEqual(args[0], "aurora_image_from_bytes")
+        self.assertEqual(args[0], IMAGE_FROM_BYTES)
         self.assertEqual(args[1], raw)
         self.assertIs(args[2], loader._handle)
         self.assertIsNone(img.source_path)
