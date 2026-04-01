@@ -1,9 +1,9 @@
 # AURORA — Runtime seam framing (Phase B, M06–M09)
 
-**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam; M09 composed runtime smoke tests)  
-**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), what **M09 smoke tests** prove at the composed seam layer, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
+**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam; M09 composed runtime smoke tests; M19 audio seam; M21 **`NativeAudioDispatcher`** for bounded D1)  
+**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), what **M09 smoke tests** prove at the composed seam layer, **M21**’s optional concrete audio dispatcher, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
 
-**Last updated:** 2026-03-27
+**Last updated:** 2026-04-01
 
 See also: `docs/runtime_surface_strategy.md` (ingress and Phase B entry contract), `docs/runtime_substrate.md` (package boundary), `docs/aurora.md` (project record).
 
@@ -142,6 +142,12 @@ M09 does **not**:
 - modify upstream Tasks **`image.py`** or workspace **`mediapipe/`**;
 - wire dispatch tokens to real native implementations;
 - add task bases, kernel extraction, or placeholder smoke tests for domains without a current first-party surface.
+
+## 6d. M21 — **`NativeAudioDispatcher`** (bounded D1)
+
+**M21** adds an **optional** concrete **`Dispatcher`** implementation — **`NativeAudioDispatcher`** — that uses **`audio_native_bindings`** to call the Tasks **AudioClassifier** C API symbols (**`MpAudioClassifier*`**) for **`AUDIO_FROM_FILE`** only, with a **model path** supplied at dispatcher construction time and the **audio file path** still coming from **`AuroraAudio.from_file`**. **`audio_dispatch.py`** remains unchanged as the seam-level caller.
+
+**What M21 does not prove:** decode correctness, graph or model correctness, **`AUDIO_FROM_BYTES`** on this dispatcher, or that CI runs a real MediaPipe graph — see **`DEVELOPMENT.md`**.
 
 ---
 

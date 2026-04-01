@@ -5,7 +5,8 @@
 ``AuroraImage`` / ``ImageCreationError`` (M08) route image creation through injected seams;
 ``image.py`` does not load native libraries directly.
 ``AuroraAudio`` / ``AudioCreationError`` (M19) are the bounded audio seam sibling — not
-acoustic kernel extraction or decode correctness.
+acoustic kernel extraction or decode correctness. Optional ``NativeAudioDispatcher`` (M21)
+wires ``AUDIO_FROM_FILE`` to the Tasks C API when explicitly used — see ``DEVELOPMENT.md``.
 """
 
 from __future__ import annotations

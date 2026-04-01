@@ -75,3 +75,9 @@ When Phase D implementation milestones begin, **this file** should be updated at
 ## 8. M20 (graph mapping / scope lock — docs)
 
 **M20** delivers **Candidate B**-style documentation only: **`docs/audio_classifier_graph_mapping.md`** (evidence-backed inspection of the workspace **`mediapipe/`** clone) plus alignment updates in **`docs/acoustic_kernel_surface_inventory.md`** and **`docs/aurora.md`**. **Not** authorized: **`src/aurora/`** runtime changes by default, C++/BUILD/TFLite work in **`aurora/`**, MediaPipe code copy, or claims of native / decode / application correctness. Proof bar: **governance / planning** — repo-safety CI green; mapping is **descriptive** evidence for a **future** milestone that might address **D1** (wire **`AUDIO_*`** to a real path).
+
+---
+
+## 9. M21 (bounded D1 — native **`AUDIO_FROM_FILE`** wiring)
+
+**M21** is the first **implementation** milestone that addresses **D1** in a **narrow** way: internal ctypes **`audio_native_bindings`** plus **`NativeAudioDispatcher`** route **`AUDIO_FROM_FILE`** through the upstream **`MpAudioClassifier*`** C API surface (see **`docs/audio_classifier_graph_mapping.md`**) while preserving **`audio_dispatch.py`** as the seam-level caller. **Structural** CI proof only — **not** decode correctness, graph execution, or Tasks parity. **`AUDIO_FROM_BYTES`** remains deferred on this dispatcher; **no** C++/BUILD/TFLite work in **`aurora/`**; **no** framer-as-node claim beyond **M20**’s BUILD-vs-**`.cc`** record.
