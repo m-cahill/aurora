@@ -26,10 +26,12 @@ SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/dispatcher.py",
     "src/aurora/runtime/library_loader.py",
     "src/aurora/runtime/errors.py",  # M13 — internal runtime error base (structural presence)
-    "src/aurora/runtime/dispatch_tokens.py",  # M14 — centralized dispatch operation tokens
+    "src/aurora/runtime/dispatch_tokens.py",  # M14/M19 — centralized dispatch operation tokens
     "src/aurora/runtime/image_dispatch.py",  # M15 — AuroraImage dispatch invocation contract
+    "src/aurora/runtime/audio_dispatch.py",  # M19 — AuroraAudio dispatch invocation contract
     "src/aurora/runtime/shared_library_loader.py",
     "src/aurora/runtime/image.py",  # M08 — bounded image seam (structural presence only)
+    "src/aurora/runtime/audio.py",  # M19 — bounded audio seam (structural presence only)
 )
 
 # Headings that M01 established as required continuity signals.
