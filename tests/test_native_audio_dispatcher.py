@@ -1,4 +1,4 @@
-"""Tests for M21 native audio dispatcher and ctypes bindings (stdlib unittest).
+"""Tests for M21/M22 native audio dispatcher and ctypes bindings (stdlib unittest).
 
 Uses in-process fake callables attached to a library stand-in — no real Tasks binary.
 """
@@ -153,16 +153,23 @@ class TestNativeAudioDispatcher(unittest.TestCase):
         with self.assertRaises(TypeError):
             disp.dispatch("only_one")
 
-    def test_audio_from_bytes_deferred(self) -> None:
+    def test_dispatch_bytes_success_shape(self) -> None:
         from aurora.runtime.dispatch_tokens import AUDIO_FROM_BYTES  # noqa: PLC0415
-        from aurora.runtime.native_audio_dispatcher import (  # noqa: PLC0415
-            AudioNativeBytesDeferredError,
-            NativeAudioDispatcher,
-        )
+        from aurora.runtime.native_audio_dispatcher import NativeAudioDispatcher  # noqa: PLC0415
+
+        disp = NativeAudioDispatcher(model_asset_path="/models/x.tflite")
+        lib = _make_fake_lib()
+        out = disp.dispatch(AUDIO_FROM_BYTES, b"\x00" * 8, lib)
+        self.assertEqual(out["kind"], "native_audio_bytes")
+        self.assertEqual(out["results_count"], 3)
+
+    def test_audio_from_bytes_payload_must_be_bytes(self) -> None:
+        from aurora.runtime.dispatch_tokens import AUDIO_FROM_BYTES  # noqa: PLC0415
+        from aurora.runtime.native_audio_dispatcher import NativeAudioDispatcher  # noqa: PLC0415
 
         disp = NativeAudioDispatcher(model_asset_path="m.tflite")
-        with self.assertRaises(AudioNativeBytesDeferredError):
-            disp.dispatch(AUDIO_FROM_BYTES, b"x", _make_fake_lib())
+        with self.assertRaises(TypeError):
+            disp.dispatch(AUDIO_FROM_BYTES, "not-bytes", _make_fake_lib())
 
     def test_unknown_token(self) -> None:
         from aurora.runtime.native_audio_dispatcher import NativeAudioDispatcher  # noqa: PLC0415
@@ -270,22 +277,34 @@ class TestNativeAudioDispatcher(unittest.TestCase):
         finally:
             Path(tmp_path).unlink(missing_ok=True)
 
-    def test_aurora_audio_from_bytes_still_deferred(self) -> None:
-        from aurora.runtime.audio import (  # noqa: PLC0415
-            AudioCreationError,
-            AuroraAudio,
-        )
-        from aurora.runtime.native_audio_dispatcher import (  # noqa: PLC0415
-            AudioNativeBytesDeferredError,
-            NativeAudioDispatcher,
-        )
+    def test_aurora_audio_from_bytes_with_native_dispatcher(self) -> None:
+        from aurora.runtime.audio import AuroraAudio  # noqa: PLC0415
+        from aurora.runtime.native_audio_dispatcher import NativeAudioDispatcher  # noqa: PLC0415
 
         disp = NativeAudioDispatcher(model_asset_path="m.tflite")
         loader = mock.Mock()
         loader.shared_library.return_value = _make_fake_lib()
-        with self.assertRaises(AudioCreationError) as ctx:
-            AuroraAudio.from_bytes(b"\x00\x01", disp, loader)
-        self.assertIsInstance(ctx.exception.__cause__, AudioNativeBytesDeferredError)
+        aud = AuroraAudio.from_bytes(b"\x00\x00\x00\x00", disp, loader)
+        self.assertEqual(aud.native_handle["kind"], "native_audio_bytes")
+        self.assertEqual(aud.native_handle["results_count"], 3)
+        self.assertIsNone(aud.source_path)
+
+    def test_mp_audio_data_from_raw_octets_matches_file_read(self) -> None:
+        from aurora.runtime.native_audio_dispatcher import (  # noqa: PLC0415
+            _mp_audio_data_from_file,
+            _mp_audio_data_from_raw_octets,
+        )
+
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp.write(b"\xaa\xbb\xcc\xdd")
+            p = tmp.name
+        try:
+            d1, _ = _mp_audio_data_from_file(p)
+            d2, _ = _mp_audio_data_from_raw_octets(b"\xaa\xbb\xcc\xdd")
+            self.assertEqual(d1.audio_data_size, d2.audio_data_size)
+            self.assertEqual(d1.num_channels, d2.num_channels)
+        finally:
+            Path(p).unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

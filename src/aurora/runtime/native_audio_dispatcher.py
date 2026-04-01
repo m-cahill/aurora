@@ -1,9 +1,8 @@
-"""Concrete :class:`~aurora.runtime.dispatcher.Dispatcher` for bounded audio C API (M21).
+"""Concrete :class:`~aurora.runtime.dispatcher.Dispatcher` for bounded audio C API (M21–M22).
 
-Routes ``AUDIO_FROM_FILE`` through ``MpAudioClassifierCreate`` → ``MpAudioClassifierClassify``
-→ ``MpAudioClassifierCloseResult`` → ``MpAudioClassifierClose`` using ctypes signatures
-from :mod:`aurora.runtime.audio_native_bindings`. ``AUDIO_FROM_BYTES`` remains explicitly
-deferred.
+Routes ``AUDIO_FROM_FILE`` and ``AUDIO_FROM_BYTES`` through ``MpAudioClassifierCreate`` →
+``MpAudioClassifierClassify`` → ``MpAudioClassifierCloseResult`` → ``MpAudioClassifierClose``
+using ctypes signatures from :mod:`aurora.runtime.audio_native_bindings`.
 
 **Does not prove:** WAV decode, graph correctness, or MediaPipe parity — see ``DEVELOPMENT.md``.
 """
@@ -28,11 +27,6 @@ from .audio_native_bindings import (
     free_error_message,
 )
 from .dispatch_tokens import AUDIO_FROM_BYTES, AUDIO_FROM_FILE
-from .errors import AuroraRuntimeError
-
-
-class AudioNativeBytesDeferredError(AuroraRuntimeError):
-    """Raised when :class:`NativeAudioDispatcher` receives ``AUDIO_FROM_BYTES`` (deferred)."""
 
 
 def _invoke_mp_status(lib: Any, fn: Any, *core_args: Any) -> int:
@@ -53,12 +47,12 @@ def _invoke_mp_status(lib: Any, fn: Any, *core_args: Any) -> int:
         free_error_message(lib, error_msg)
 
 
-def _mp_audio_data_from_file(path: str) -> tuple[MpAudioDataC, list[Any]]:
-    """Build ``MpAudioData`` from raw file bytes (not a format decoder).
+def _mp_audio_data_from_raw_octets(raw: bytes) -> tuple[MpAudioDataC, list[Any]]:
+    """Build ``MpAudioData`` from raw octets (not a format decoder).
 
-    M21 reads octets as float32 lanes for structural binding tests only.
+    Interprets leading octets as float32 lanes for structural binding tests only — same
+    honesty posture as M21 file-backed path.
     """
-    raw = Path(path).read_bytes()
     nbytes = len(raw)
     nfloats = nbytes // 4
     keepalive: list[Any] = []
@@ -75,6 +69,12 @@ def _mp_audio_data_from_file(path: str) -> tuple[MpAudioDataC, list[Any]]:
     data.audio_data = ctypes.cast(buf, ctypes.POINTER(ctypes.c_float))
     data.audio_data_size = nfloats * 4
     return data, keepalive
+
+
+def _mp_audio_data_from_file(path: str) -> tuple[MpAudioDataC, list[Any]]:
+    """Build ``MpAudioData`` from a file path (reads bytes then same raw-octet path)."""
+    raw = Path(path).read_bytes()
+    return _mp_audio_data_from_raw_octets(raw)
 
 
 def _fill_classifier_options(
@@ -114,10 +114,11 @@ def _fill_classifier_options(
 
 
 class NativeAudioDispatcher:
-    """Dispatcher that invokes the Tasks AudioClassifier C API for ``AUDIO_FROM_FILE``.
+    """Dispatcher that invokes the Tasks AudioClassifier C API for audio clip tokens.
 
     The caller supplies a **model** path at construction time; ``dispatch``'s payload is the
-    **audio** file path (first-party ``AuroraAudio`` contract).
+    **audio** file path (``AUDIO_FROM_FILE``) or raw **bytes** (``AUDIO_FROM_BYTES``) per
+    the first-party ``AuroraAudio`` contract.
     """
 
     __slots__ = (
@@ -147,28 +148,40 @@ class NativeAudioDispatcher:
                 f"(token, payload, lib), got {len(args)}"
             )
         token, payload, lib = args
-        if token == AUDIO_FROM_BYTES:
-            raise AudioNativeBytesDeferredError(
-                "AUDIO_FROM_BYTES is not implemented for NativeAudioDispatcher (deferred)"
-            )
-        if token != AUDIO_FROM_FILE:
-            raise ValueError(
-                "unsupported audio dispatch token for "
-                f"NativeAudioDispatcher: {token!r}"
-            )
-        if not isinstance(payload, str):
-            raise TypeError("AUDIO_FROM_FILE payload must be a str path")
-        audio_path = payload
         api = bind_audio_classifier(lib)
-        return self._dispatch_file(api, lib, audio_path)
+        if token == AUDIO_FROM_BYTES:
+            if not isinstance(payload, bytes):
+                raise TypeError("AUDIO_FROM_BYTES payload must be bytes")
+            return self._dispatch_bytes(api, lib, payload)
+        if token == AUDIO_FROM_FILE:
+            if not isinstance(payload, str):
+                raise TypeError("AUDIO_FROM_FILE payload must be a str path")
+            return self._dispatch_file(api, lib, payload)
+        raise ValueError(
+            "unsupported audio dispatch token for " f"NativeAudioDispatcher: {token!r}"
+        )
 
     def _dispatch_file(self, api: AudioClassifierCApi, lib: Any, audio_path: str) -> dict[str, Any]:
+        audio_data, _audio_keep = _mp_audio_data_from_file(audio_path)
+        return self._dispatch_classify(api, lib, audio_data, kind="native_audio_file")
+
+    def _dispatch_bytes(self, api: AudioClassifierCApi, lib: Any, raw: bytes) -> dict[str, Any]:
+        audio_data, _audio_keep = _mp_audio_data_from_raw_octets(raw)
+        return self._dispatch_classify(api, lib, audio_data, kind="native_audio_bytes")
+
+    def _dispatch_classify(
+        self,
+        api: AudioClassifierCApi,
+        lib: Any,
+        audio_data: MpAudioDataC,
+        *,
+        kind: str,
+    ) -> dict[str, Any]:
         opts, _path_keepalive = _fill_classifier_options(
             self._model_asset_path,
             host_environment=self._host_environment,
             host_system=self._host_system,
         )
-        audio_data, _audio_keep = _mp_audio_data_from_file(audio_path)
 
         classifier = ctypes.c_void_p()
         _invoke_mp_status(
@@ -196,10 +209,10 @@ class NativeAudioDispatcher:
                 _invoke_mp_status(lib, api.close, classifier)
 
         return {
-            "kind": "native_audio_file",
+            "kind": kind,
             "mp_status": K_MP_OK,
             "results_count": results_count,
         }
 
 
-__all__ = ["AudioNativeBytesDeferredError", "NativeAudioDispatcher"]
+__all__ = ["NativeAudioDispatcher"]
