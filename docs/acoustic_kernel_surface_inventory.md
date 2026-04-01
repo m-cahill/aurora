@@ -42,7 +42,7 @@ These exist in upstream MediaPipe and matter for product completeness; they are 
 |--------|-----------------------------------|------|
 | **Tasks Python audio** | `mediapipe/tasks/python/audio/` | Public Python API surface for audio tasks (e.g. classifier), `core/audio_record.py`, `core/audio_task_running_mode.py`, package `BUILD`. This is the **Python ingress** that would eventually align with first-party `aurora.runtime` seams if a milestone authorizes it. |
 
-**Ingress note:** Today, **`aurora/`** has no audio modules; Phase A–C work normalized **image** dispatch (`AuroraImage`, tokens, `image_dispatch.py`). A future audio seam would be **analogous in shape** (bounded Python contract) but is **not** implied by this inventory alone.
+**Ingress note:** Phase A–C normalized **image** dispatch (`AuroraImage`, tokens, `image_dispatch.py`). **M19** adds the parallel bounded **audio** seam (`AuroraAudio`, `audio_dispatch.py`, `AUDIO_*` tokens in `dispatch_tokens.py`) — **structural** first-party vocabulary only; **not** kernel extraction or upstream parity (see **`DEVELOPMENT.md`**).
 
 ### 2.2 C++ task-layer audio surface
 

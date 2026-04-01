@@ -85,9 +85,9 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, and **`src/aurora/runtime/image.py` (M08)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, and **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
-- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
+- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 
@@ -120,9 +120,9 @@ When green, CI indicates:
 
 ### M13 runtime surface coherence (what it proves)
 
-- **`src/aurora/runtime/errors.py`** defines **`AuroraRuntimeError`**, a **shared internal base** for first-party seam exceptions. **`SharedLibraryLoadError`** and **`ImageCreationError`** subclass it; **public exception names, messages, and `raise … from …` chaining** match M07/M08 behavior.
+- **`src/aurora/runtime/errors.py`** defines **`AuroraRuntimeError`**, a **shared internal base** for first-party seam exceptions. **`SharedLibraryLoadError`**, **`ImageCreationError`**, and **`AudioCreationError`** (M19) subclass it; **public exception names, messages, and `raise … from …` chaining** match M07/M08/M19 behavior.
 - **`AuroraImage`** uses a **private** `_from_dispatch` helper so `from_file` / `from_bytes` share one implementation path; **no new public API** was added for that helper.
-- **`AuroraRuntimeError`** is **internal** to the runtime package (not re-exported from `aurora.runtime.__all__`); callers continue to catch **`ImageCreationError`** / **`SharedLibraryLoadError`** as before.
+- **`AuroraRuntimeError`** is **internal** to the runtime package (not re-exported from `aurora.runtime.__all__`); callers continue to catch **`ImageCreationError`** / **`AudioCreationError`** / **`SharedLibraryLoadError`** as before.
 
 ### M13 non-goals (explicit)
 
@@ -149,10 +149,22 @@ When green, CI indicates:
 - **No** new public runtime API, **`Dispatcher`** / **`LibraryLoader`** protocol changes, or token value changes.
 - **No** `VisionTaskBase` / `AudioTaskBase`, lifecycle extraction, logging migration, kernel work, or upstream Tasks migration.
 
-### What M05 / M06 / M07 / M08 / M09 do not prove
+### M19 bounded audio seam (what it proves)
+
+- **First code-bearing Phase D slice (Candidate A):** **`AuroraAudio`** / **`AudioCreationError`** in **`src/aurora/runtime/audio.py`**, parallel in shape to **`AuroraImage`**, routing **`from_file`** / **`from_bytes`** through injected **`Dispatcher`** and **`LibraryLoader`**; **`audio.py`** does not call **`ctypes`** or **`CDLL`**.
+- **`src/aurora/runtime/dispatch_tokens.py`** includes **`AUDIO_FROM_FILE`** and **`AUDIO_FROM_BYTES`** (single shared vocabulary with image tokens). **`src/aurora/runtime/audio_dispatch.py`** owns the frozen **`Dispatcher.dispatch`** invocation contract **`(token, payload, lib)`** for audio. Helpers and tokens are **not** re-exported from **`aurora.runtime.__all__`**; **`AuroraAudio`** and **`AudioCreationError`** are exported like the image seam.
+- **`tests/test_audio_runtime.py`** (fakes) and **`tests/test_runtime_smoke.py`** (composed audio smoke with patched **`CDLL`**) exercise the seam — **structural** proof only.
+
+### M19 non-goals (explicit)
+
+- **No** acoustic kernel extraction, C++ calculators, BUILD/graph/TFLite work, or MediaPipe code copy into **`aurora/`**.
+- **No** decode correctness, native correctness, MediaPipe Tasks parity, **`@com_google_audio_tools`** integration in-repo, sample-rate/duration metadata, or segment-oriented APIs — offline/deterministic **Python seam** vocabulary only.
+- **No** `VisionTaskBase` / `AudioTaskBase`, ARB, ORNITHOS, or BirdCLEF harness.
+
+### What M05 / M06 / M07 / M08 / M09 / M19 do not prove
 
 - **MediaPipe** or native runtime correctness — CI does not exercise upstream graphs or tasks.
-- **Decode correctness**, **MediaPipe parity**, or **real native execution** on the CI host — M09 smoke tests remain **fake-backed**; dispatch tokens are **conventions** until wired to a real implementation elsewhere.
+- **Decode correctness**, **MediaPipe parity**, or **real native execution** on the CI host — M09 / M19 smoke tests remain **fake-backed**; dispatch tokens are **conventions** until wired to a real implementation elsewhere.
 - Upstream Tasks **`image.py`** migration inside a fork — M08 is the **in-repo** bounded surface only; see `docs/runtime_seam_framing.md` and `docs/aurora.md`.
 - That any particular shared-library path is valid, safe, or compatible with MediaPipe — only that the **AURORA** loader wrapper behaves as documented when `CDLL` succeeds or fails.
 

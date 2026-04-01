@@ -21,7 +21,7 @@ These are **plausible** places future Phase D work could attach; they are **not*
 | Surface | Role |
 |--------|------|
 | **`docs/`** in this repo | Strategy, boundaries, and references that keep extraction incremental and auditable. |
-| **First-party `src/aurora/`** | Future bounded modules that compose with existing **`Dispatcher` / `LibraryLoader`** / **`AuroraImage`** seams — only when a milestone explicitly authorizes code. |
+| **First-party `src/aurora/`** | Bounded modules that compose with existing **`Dispatcher` / `LibraryLoader`** seams — **M19** authorizes **`AuroraAudio`** (Candidate A) only; further modules remain milestone-gated. |
 | **Verifier / CI** | Future gates that match an agreed extraction seam — **not** changed in planning-only milestones unless the milestone says so. |
 | **Workspace `mediapipe/`** (read-only) | Study and evidence only; **no** copy of upstream source into `aurora/`. |
 
@@ -63,3 +63,9 @@ Refactor and Phase D planning **must not** remove the ability to pursue a **cred
 - **Workspace vision / audits** — context only; not committed here unless copied in a doc milestone.
 
 When Phase D implementation milestones begin, **this file** should be updated at closeout so ingress narrative stays aligned with what actually landed.
+
+---
+
+## 7. M19 (first bounded implementation slice)
+
+**M19** is authorized **only** for **Candidate A** in **`docs/acoustic_kernel_surface_inventory.md`** §5: a **bounded Python-first audio seam** (**`AuroraAudio`**, shared **`dispatch_tokens`**, **`audio_dispatch.py`**) with **structural** tests — **not** C++ calculators, BUILD/graph work, TFLite decoupling, or MediaPipe code copy. Proof bar: behavior class (**additive seam**), verification (unittest fakes + composed smoke; **`verify_repo_state.py`** seam list), rollback (revert M19 commits), blast radius (**`src/aurora/runtime/`** + tests + docs — no `mediapipe/`).

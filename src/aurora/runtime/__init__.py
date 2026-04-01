@@ -4,10 +4,13 @@
 ``SharedLibraryLoader`` is a first-party ``ctypes.CDLL`` wrapper — not MediaPipe.
 ``AuroraImage`` / ``ImageCreationError`` (M08) route image creation through injected seams;
 ``image.py`` does not load native libraries directly.
+``AuroraAudio`` / ``AudioCreationError`` (M19) are the bounded audio seam sibling — not
+acoustic kernel extraction or decode correctness.
 """
 
 from __future__ import annotations
 
+from .audio import AudioCreationError, AuroraAudio
 from .dispatcher import Dispatcher
 from .image import AuroraImage, ImageCreationError
 from .library_loader import LibraryLoader
@@ -25,6 +28,8 @@ __all__ = [
     "Dispatcher",
     "AuroraImage",
     "ImageCreationError",
+    "AuroraAudio",
+    "AudioCreationError",
     "LibraryLoader",
     "SharedLibraryLoader",
     "SharedLibraryLoadError",

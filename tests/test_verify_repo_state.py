@@ -84,6 +84,8 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "from __future__ import annotations\n\n"
             "IMAGE_FROM_FILE = \"aurora_image_from_file\"\n"
             "IMAGE_FROM_BYTES = \"aurora_image_from_bytes\"\n"
+            "AUDIO_FROM_FILE = \"aurora_audio_from_file\"\n"
+            "AUDIO_FROM_BYTES = \"aurora_audio_from_bytes\"\n"
         ),
         "src/aurora/runtime/image_dispatch.py": (
             '"""ID."""\n'
@@ -102,6 +104,24 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             ") -> Any:\n"
             "    lib = library_loader.shared_library()\n"
             "    return dispatcher.dispatch(IMAGE_FROM_BYTES, data, lib)\n"
+        ),
+        "src/aurora/runtime/audio_dispatch.py": (
+            '"""AD."""\n'
+            "from __future__ import annotations\n"
+            "from typing import Any\n"
+            "from aurora.runtime.dispatch_tokens import AUDIO_FROM_BYTES, AUDIO_FROM_FILE\n"
+            "from aurora.runtime.dispatcher import Dispatcher\n"
+            "from aurora.runtime.library_loader import LibraryLoader\n"
+            "def dispatch_audio_from_file(\n"
+            "    dispatcher: Dispatcher, library_loader: LibraryLoader, path: str\n"
+            ") -> Any:\n"
+            "    lib = library_loader.shared_library()\n"
+            "    return dispatcher.dispatch(AUDIO_FROM_FILE, path, lib)\n"
+            "def dispatch_audio_from_bytes(\n"
+            "    dispatcher: Dispatcher, library_loader: LibraryLoader, data: bytes\n"
+            ") -> Any:\n"
+            "    lib = library_loader.shared_library()\n"
+            "    return dispatcher.dispatch(AUDIO_FROM_BYTES, data, lib)\n"
         ),
         "src/aurora/runtime/shared_library_loader.py": (
             '"""S."""\n'
@@ -125,6 +145,23 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "    pass\n"
             "@dataclass(frozen=True, slots=True)\n"
             "class AuroraImage:\n"
+            "    dispatcher: Dispatcher\n"
+            "    library_loader: LibraryLoader\n"
+            "    native_handle: Any\n"
+            "    source_path: str | None = None\n"
+        ),
+        "src/aurora/runtime/audio.py": (
+            '"""AU."""\n'
+            "from __future__ import annotations\n"
+            "from dataclasses import dataclass\n"
+            "from typing import Any\n"
+            "from aurora.runtime.dispatcher import Dispatcher\n"
+            "from aurora.runtime.errors import AuroraRuntimeError\n"
+            "from aurora.runtime.library_loader import LibraryLoader\n"
+            "class AudioCreationError(AuroraRuntimeError):\n"
+            "    pass\n"
+            "@dataclass(frozen=True, slots=True)\n"
+            "class AuroraAudio:\n"
             "    dispatcher: Dispatcher\n"
             "    library_loader: LibraryLoader\n"
             "    native_handle: Any\n"
