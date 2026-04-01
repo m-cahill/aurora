@@ -4,6 +4,8 @@
 
 **Canonical project record:** `aurora.md` — Phase D remains **planning / ingress / scoping** until a milestone explicitly authorizes implementation beyond that scope.
 
+**M20 follow-on (narrow graph map):** For the **AudioClassifier** Python → C++ → graph → calculator chain (including **BUILD vs `.cc` composition** nuance for `time_series_framer_calculator`), see **`docs/audio_classifier_graph_mapping.md`** — refreshed from direct inspection of the workspace clone (**`mediapipe/mediapipe/`** prefix from workspace root).
+
 **Evidence basis:** File paths and `BUILD` dependency edges are taken from the workspace `mediapipe/` tree at inventory time (read-only inspection). Paths use forward slashes for portability.
 
 ---
@@ -48,7 +50,7 @@ These exist in upstream MediaPipe and matter for product completeness; they are 
 
 | Group | Location | Role |
 |--------|----------|------|
-| **Audio classifier** | `mediapipe/tasks/cc/audio/audio_classifier/` | `audio_classifier.cc` / `.h`, **`audio_classifier_graph.cc`** — composes **framer**, **`audio_to_tensor`**, **TFLite inference**, post-processing. |
+| **Audio classifier** | `mediapipe/tasks/cc/audio/audio_classifier/` | `audio_classifier.cc` / `.h`, **`audio_classifier_graph.cc`** — composes **`AudioToTensorCalculator`**, **TFLite inference** (`AddInference`), **classification post-processing**; framing/resampling is handled **inside** `AudioToTensorCalculator` in the inspected graph source (see **`docs/audio_classifier_graph_mapping.md`** — the `audio_classifier_graph` **BUILD** target also lists `time_series_framer_calculator`, but **no** separate framer node appears in **`audio_classifier_graph.cc`**). |
 | **Core task API** | `mediapipe/tasks/cc/audio/core/` | `base_audio_task_api.h`, `audio_task_api_factory.h`, `running_mode.h` — shared Tasks audio API patterns. |
 | **Utils** | `mediapipe/tasks/cc/audio/utils/` | `audio_tensor_specs` — tensor layout / specs for audio tasks. |
 
@@ -118,7 +120,7 @@ This is a **specific** map of **direct** `BUILD` edges — **not** a full transi
 
 | Surface | Composition note | TFLite / inference |
 |---------|------------------|---------------------|
-| `audio_classifier_graph` | Depends on `time_series_framer_calculator`, `audio_to_tensor_calculator`, `inference_calculator_cpu`, constant/side-packet calculators | **Yes** — immediate TFLite + model resources path |
+| `audio_classifier_graph` | **BUILD** deps include `time_series_framer_calculator`, `audio_to_tensor_calculator`, `inference_calculator_cpu`, constant/side-packet calculators; **graph `.cc`** wires `AudioToTensorCalculator` → inference → post-processing (see **`docs/audio_classifier_graph_mapping.md`** §3.2) | **Yes** — immediate TFLite + model resources path |
 
 ---
 
@@ -128,7 +130,7 @@ Rows are included **only** where individual calculators change **ingress risk**,
 
 | Calculator / target | Ingress relevance | `@com_google_audio_tools` | Notes |
 |---------------------|-------------------|----------------------------|--------|
-| `time_series_framer_calculator` | **Framing** entry point for many graphs; lower MFCC/spectrogram surface area than full spectral stack | `window_functions` | Used directly by **`audio_classifier_graph`**. |
+| `time_series_framer_calculator` | **Framing** entry point for many graphs; lower MFCC/spectrogram surface area than full spectral stack | `window_functions` | **BUILD** dependency of the **`audio_classifier_graph`** target; **not** a separate node in **`audio_classifier_graph.cc`** (inspected M20); other graphs may use it explicitly. |
 | `audio_to_tensor_calculator` | **Bridge** to TFLite tensors; combines DSP + **inference** concerns | `resampler_q`, `window_functions` | **High** coupling: TFLite + audio_tools + `pffft`. |
 | `spectrogram_calculator` | Standalone spectral front-end | `window_functions`, `spectrogram` | Strong DSP story; not required to be “first” unless graph demands it. |
 | `mfcc_mel_calculators` | Classic ASR-style features | `mfcc` | Distinct from spectrogram-only path; own proto options. |
@@ -161,7 +163,7 @@ This section **recommends** a single **first** slice for **M19** and lists **alt
 
 ### Candidate B — viable but **higher** dependency / risk
 
-**Slice:** **Documentation + structural mapping** of the **`audio_classifier_graph`** wiring (Python entry → C++ graph → `time_series_framer` + `audio_to_tensor` + inference) with **no** or **minimal** code — *or* a **read-only** analysis artifact checked in (e.g. generated graph dependency list from `BUILD`).
+**Slice:** **Documentation + structural mapping** of the **`audio_classifier_graph`** wiring (Python entry → C++ graph → **`audio_to_tensor`** + inference + post-processing; **BUILD** edges vs **`.cc`** composition) with **no** or **minimal** code — *or* a **read-only** analysis artifact checked in (e.g. generated graph dependency list from `BUILD`). **Delivered in committed form as** **`docs/audio_classifier_graph_mapping.md`** (**M20**).
 
 **Rationale:** Clarifies the **real** end-to-end path for future work.
 
@@ -187,8 +189,9 @@ This section **recommends** a single **first** slice for **M19** and lists **alt
 |------|---------|
 | **Inventory focus** | Python + C++ audio path; other platforms **acknowledged only**. |
 | **Dependency map** | §3 — direct `@com_google_audio_tools` edges per calculator/target; §3.2 for Tasks graph. |
-| **Recommended M19 slice** | **Candidate A** — bounded **Python-first** audio seam (tokens + dispatch contract + fake tests), **no** upstream code copy. |
-| **Alternatives** | Candidate B (graph/documentation stress), Candidate C (calculator/C++ — deferred). |
+| **Recommended M19 slice** | **Candidate A** — bounded **Python-first** audio seam (tokens + dispatch contract + fake tests), **no** upstream code copy. **Delivered (M19).** |
+| **Alternatives** | Candidate B (graph/documentation stress) — **see `docs/audio_classifier_graph_mapping.md` (M20)**; Candidate C (calculator/C++ — deferred). |
+| **M19 → future wiring** | M19 proves **first-party** `AUDIO_*` / `AuroraAudio` **vocabulary** only. **D1** (wire tokens to real native/Tasks path) remains **deferred** until a milestone locks scope; **M20** documents the upstream **AudioClassifier** chain so that milestone can target a **narrow** seam with explicit proof bars. |
 
 ---
 
@@ -196,5 +199,6 @@ This section **recommends** a single **first** slice for **M19** and lists **alt
 
 - `aurora.md` — phase state, milestone ledger, Phase D constraints.
 - `kernel_ingress_strategy.md` — Phase D entry framing.
+- `audio_classifier_graph_mapping.md` — **M20** — AudioClassifier graph mapping and native-wiring target lock (evidence-backed).
 - `runtime_surface_strategy.md` — ingress rules, TFLite / audio_tools constraints.
 - `../DEVELOPMENT.md` — what current CI proves and does not prove.
