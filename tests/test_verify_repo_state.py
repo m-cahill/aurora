@@ -167,6 +167,14 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
             "    native_handle: Any\n"
             "    source_path: str | None = None\n"
         ),
+        "src/aurora/runtime/audio_native_bindings.py": (
+            '"""M21 bindings stub for verifier fixture."""\n'
+            "X = 1\n"
+        ),
+        "src/aurora/runtime/native_audio_dispatcher.py": (
+            '"""M21 dispatcher stub for verifier fixture."""\n'
+            "Y = 1\n"
+        ),
     }
 
 

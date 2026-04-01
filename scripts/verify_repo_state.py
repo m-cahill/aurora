@@ -29,6 +29,9 @@ SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/dispatch_tokens.py",  # M14/M19 — centralized dispatch operation tokens
     "src/aurora/runtime/image_dispatch.py",  # M15 — AuroraImage dispatch invocation contract
     "src/aurora/runtime/audio_dispatch.py",  # M19 — AuroraAudio dispatch invocation contract
+    "src/aurora/runtime/audio_native_bindings.py",  # M21 — AudioClassifier C API ctypes surface
+    # M21 — concrete Dispatcher for AUDIO_FROM_FILE
+    "src/aurora/runtime/native_audio_dispatcher.py",
     "src/aurora/runtime/shared_library_loader.py",
     "src/aurora/runtime/image.py",  # M08 — bounded image seam (structural presence only)
     "src/aurora/runtime/audio.py",  # M19 — bounded audio seam (structural presence only)
