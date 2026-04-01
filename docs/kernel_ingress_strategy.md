@@ -69,3 +69,9 @@ When Phase D implementation milestones begin, **this file** should be updated at
 ## 7. M19 (first bounded implementation slice)
 
 **M19** is authorized **only** for **Candidate A** in **`docs/acoustic_kernel_surface_inventory.md`** §5: a **bounded Python-first audio seam** (**`AuroraAudio`**, shared **`dispatch_tokens`**, **`audio_dispatch.py`**) with **structural** tests — **not** C++ calculators, BUILD/graph work, TFLite decoupling, or MediaPipe code copy. Proof bar: behavior class (**additive seam**), verification (unittest fakes + composed smoke; **`verify_repo_state.py`** seam list), rollback (revert M19 commits), blast radius (**`src/aurora/runtime/`** + tests + docs — no `mediapipe/`).
+
+---
+
+## 8. M20 (graph mapping / scope lock — docs)
+
+**M20** delivers **Candidate B**-style documentation only: **`docs/audio_classifier_graph_mapping.md`** (evidence-backed inspection of the workspace **`mediapipe/`** clone) plus alignment updates in **`docs/acoustic_kernel_surface_inventory.md`** and **`docs/aurora.md`**. **Not** authorized: **`src/aurora/`** runtime changes by default, C++/BUILD/TFLite work in **`aurora/`**, MediaPipe code copy, or claims of native / decode / application correctness. Proof bar: **governance / planning** — repo-safety CI green; mapping is **descriptive** evidence for a **future** milestone that might address **D1** (wire **`AUDIO_*`** to a real path).
