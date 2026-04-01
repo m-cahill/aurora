@@ -143,11 +143,13 @@ M09 does **not**:
 - wire dispatch tokens to real native implementations;
 - add task bases, kernel extraction, or placeholder smoke tests for domains without a current first-party surface.
 
-## 6d. M21 — **`NativeAudioDispatcher`** (bounded D1)
+## 6d. M21 / M22 — **`NativeAudioDispatcher`** (bounded D1)
 
-**M21** adds an **optional** concrete **`Dispatcher`** implementation — **`NativeAudioDispatcher`** — that uses **`audio_native_bindings`** to call the Tasks **AudioClassifier** C API symbols (**`MpAudioClassifier*`**) for **`AUDIO_FROM_FILE`** only, with a **model path** supplied at dispatcher construction time and the **audio file path** still coming from **`AuroraAudio.from_file`**. **`audio_dispatch.py`** remains unchanged as the seam-level caller.
+**M21** adds an **optional** concrete **`Dispatcher`** implementation — **`NativeAudioDispatcher`** — that uses **`audio_native_bindings`** to call the Tasks **AudioClassifier** C API symbols (**`MpAudioClassifier*`**) with a **model path** supplied at dispatcher construction time. **`dispatch(AUDIO_FROM_FILE, …)`** uses the **audio file path** from **`AuroraAudio.from_file`**. **`audio_dispatch.py`** remains unchanged as the seam-level caller.
 
-**What M21 does not prove:** decode correctness, graph or model correctness, **`AUDIO_FROM_BYTES`** on this dispatcher, or that CI runs a real MediaPipe graph — see **`DEVELOPMENT.md`**.
+**M22** extends the same dispatcher: **`dispatch(AUDIO_FROM_BYTES, …)`** uses **raw `bytes`** with the same **structural** float32-lane mapping as the file-backed path (not codec decode), and the same **create → classify → close-result → close** lifecycle as **`AUDIO_FROM_FILE`**.
+
+**What M21 / M22 do not prove:** decode correctness, graph or model correctness, or that CI runs a real MediaPipe graph — see **`DEVELOPMENT.md`**.
 
 ---
 

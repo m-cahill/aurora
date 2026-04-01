@@ -85,7 +85,7 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, and **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, and `docs/runtime_seam_framing.md`, references in `docs/aurora.md` (including `runtime_seam_framing.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21/M22)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, and **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
 - **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
@@ -165,20 +165,30 @@ When green, CI indicates:
 
 - **First explicit D1 slice (structural):** internal **`src/aurora/runtime/audio_native_bindings.py`** holds ctypes layouts and **`bind_audio_classifier`** for upstream **`MpAudioClassifierCreate`**, **`MpAudioClassifierClassify`**, **`MpAudioClassifierCloseResult`**, and **`MpAudioClassifierClose`** (plus optional **`MpErrorFree`**) — names aligned with **`docs/audio_classifier_graph_mapping.md`**, **no** `mediapipe/` import or source copy.
 - **`NativeAudioDispatcher`** (**`src/aurora/runtime/native_audio_dispatcher.py`**) implements **`Dispatcher`**: **`dispatch(AUDIO_FROM_FILE, audio_path, lib)`** runs the minimal create → classify → close-result → close sequence using **`LibraryLoader.shared_library()`** as the **`CDLL`** handle; constructor takes a **model asset path** (TFLite) separate from the **audio file path** in **`AuroraAudio.from_file`**. **`audio_dispatch.py`** remains the frozen seam-level caller — **not** bypassed.
-- **`AUDIO_FROM_BYTES`** raises **`AudioNativeBytesDeferredError`** (subclass **`AuroraRuntimeError`**) when using **`NativeAudioDispatcher`** — wrapped as **`AudioCreationError`** by **`AuroraAudio.from_bytes`** like other failures.
 - **Tests** (`tests/test_native_audio_dispatcher.py`) use **in-process fakes** with the same arity as the C API — they prove **binding surface, ordering, and error translation**, **not** real graph execution on CI.
 
 ### M21 non-goals (explicit)
 
 - **No** claim of WAV or codec decode correctness — file bytes are interpreted as raw float32 lanes for structural tests only (documented in **`native_audio_dispatcher`**).
 - **No** claim of MediaPipe graph correctness, TFLite outputs, **`AudioClassifierGraph`** internals, or **`AudioToTensorCalculator`** behavior — CI does not execute a real upstream graph.
-- **No** `AUDIO_FROM_BYTES` native path, **`VisionTaskBase` / `AudioTaskBase`**, C++/BUILD work in **`aurora/`**, or workspace **`mediapipe/`** modification.
+- **No** **`VisionTaskBase` / `AudioTaskBase`**, C++/BUILD work in **`aurora/`**, or workspace **`mediapipe/`** modification.
 - **No** documentation that **`time_series_framer_calculator`** appears as a dedicated node in **`audio_classifier_graph.cc`** — M20’s BUILD-vs-graph nuance remains authoritative.
 
-### What M05 / M06 / M07 / M08 / M09 / M19 / M21 do not prove
+### M22 bounded D1 native **`AUDIO_FROM_BYTES`** on **`NativeAudioDispatcher`** (what it proves)
+
+- **`NativeAudioDispatcher.dispatch(AUDIO_FROM_BYTES, raw_bytes, lib)`** runs the same **create → classify → close-result → close** sequence as **`AUDIO_FROM_FILE`**; **`MpAudioData`** is built from **`bytes`** with the same **structural** float32-lane interpretation as the file-backed path (**not** codec decode).
+- **`AuroraAudio.from_bytes`** can succeed with **`NativeAudioDispatcher`** when fakes succeed — same **`AudioCreationError`** wrapping as other dispatch failures.
+- **Tests** extend **`tests/test_native_audio_dispatcher.py`** — **structural** proof only.
+
+### M22 non-goals (explicit)
+
+- **No** new claims vs M21: decode correctness, graph/TFLite correctness, MediaPipe parity, or real native execution on CI.
+- **No** `VisionTaskBase` / `AudioTaskBase`, ARB, or BirdCLEF harness.
+
+### What M05 / M06 / M07 / M08 / M09 / M19 / M21 / M22 do not prove
 
 - **MediaPipe** or native runtime correctness — CI does not exercise upstream graphs or tasks.
-- **Decode correctness**, **MediaPipe parity**, or **real native execution** on the CI host — M09 / M19 smoke tests remain **fake-backed**; **M21** adds **structural** ctypes proof for **`AUDIO_FROM_FILE`** when using **`NativeAudioDispatcher`**, **not** application-level correctness of the full upstream task.
+- **Decode correctness**, **MediaPipe parity**, or **real native execution** on the CI host — M09 / M19 smoke tests remain **fake-backed**; **M21** / **M22** add **structural** ctypes proof for **`AUDIO_FROM_FILE`** / **`AUDIO_FROM_BYTES`** when using **`NativeAudioDispatcher`**, **not** application-level correctness of the full upstream task.
 - Upstream Tasks **`image.py`** migration inside a fork — M08 is the **in-repo** bounded surface only; see `docs/runtime_seam_framing.md` and `docs/aurora.md`.
 - That any particular shared-library path is valid, safe, or compatible with MediaPipe — only that the **AURORA** loader wrapper behaves as documented when `CDLL` succeeds or fails.
 

@@ -80,4 +80,10 @@ When Phase D implementation milestones begin, **this file** should be updated at
 
 ## 9. M21 (bounded D1 — native **`AUDIO_FROM_FILE`** wiring)
 
-**M21** is the first **implementation** milestone that addresses **D1** in a **narrow** way: internal ctypes **`audio_native_bindings`** plus **`NativeAudioDispatcher`** route **`AUDIO_FROM_FILE`** through the upstream **`MpAudioClassifier*`** C API surface (see **`docs/audio_classifier_graph_mapping.md`**) while preserving **`audio_dispatch.py`** as the seam-level caller. **Structural** CI proof only — **not** decode correctness, graph execution, or Tasks parity. **`AUDIO_FROM_BYTES`** remains deferred on this dispatcher; **no** C++/BUILD/TFLite work in **`aurora/`**; **no** framer-as-node claim beyond **M20**’s BUILD-vs-**`.cc`** record.
+**M21** is the first **implementation** milestone that addresses **D1** in a **narrow** way: internal ctypes **`audio_native_bindings`** plus **`NativeAudioDispatcher`** route **`AUDIO_FROM_FILE`** through the upstream **`MpAudioClassifier*`** C API surface (see **`docs/audio_classifier_graph_mapping.md`**) while preserving **`audio_dispatch.py`** as the seam-level caller. **Structural** CI proof only — **not** decode correctness, graph execution, or Tasks parity. **No** C++/BUILD/TFLite work in **`aurora/`**; **no** framer-as-node claim beyond **M20**’s BUILD-vs-**`.cc`** record. **`AUDIO_FROM_BYTES`** on **`NativeAudioDispatcher`** is completed in **M22** (§10).
+
+---
+
+## 10. M22 (bounded D1 — native **`AUDIO_FROM_BYTES`** on **`NativeAudioDispatcher`**)
+
+**M22** completes the **structural** D1 surface on **`NativeAudioDispatcher`**: **`dispatch(AUDIO_FROM_BYTES, raw_bytes, lib)`** uses the same **create → classify → close-result → close** sequence as **`AUDIO_FROM_FILE`**, building **`MpAudioData`** from **`bytes`** with the same **honesty** as the file-backed path (raw octets → float32 lanes for binding tests — **not** WAV decode). **`AudioNativeBytesDeferredError`** is removed. Proof bar: **fake-backed** unittest + **`ci` / `repo-safety`** — unchanged in **kind** (structural only). **Local-native** exercise with a real Tasks **`.so` / `.dll`**, if available, is recorded in workspace **`docs/milestones/M22/M22_local_native_proof.md`** — **not** a CI claim.
