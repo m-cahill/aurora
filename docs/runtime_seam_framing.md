@@ -1,7 +1,7 @@
 # AURORA — Runtime seam framing (Phase B, M06–M09)
 
-**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam; M09 composed runtime smoke tests; M19 audio seam; M21 **`NativeAudioDispatcher`** for bounded D1)  
-**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), what **M09 smoke tests** prove at the composed seam layer, **M21**’s optional concrete audio dispatcher, and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity.
+**Status:** Canonical committed framing (M06 contracts; M07 concrete loader; M08 bounded image seam; M09 composed runtime smoke tests; M19 audio seam; M21 **`NativeAudioDispatcher`** for bounded D1; **M23** — **Phase D** **closed** in **`docs/aurora.md`** — structural seams + explicit non-proofs, **not** local-native execution proof)  
+**Role:** Explain what the first-party **Dispatcher** and **LibraryLoader** contracts mean, what **`SharedLibraryLoader`** proves in M07, what **`AuroraImage`** proves in M08 (first-party bounded image surface — **not** upstream Tasks `image.py` migration), what **M09 smoke tests** prove at the composed seam layer, **M21**/**M22**’s concrete audio dispatcher (**structural** only), and **honest LIVE_STREAM / async** semantics — without claiming upstream runtime parity. **Phase D closure** narrative: **`docs/aurora.md`** (**M23**).
 
 **Last updated:** 2026-04-01
 

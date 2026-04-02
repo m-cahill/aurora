@@ -87,3 +87,9 @@ When Phase D implementation milestones begin, **this file** should be updated at
 ## 10. M22 (bounded D1 — native **`AUDIO_FROM_BYTES`** on **`NativeAudioDispatcher`**)
 
 **M22** completes the **structural** D1 surface on **`NativeAudioDispatcher`**: **`dispatch(AUDIO_FROM_BYTES, raw_bytes, lib)`** uses the same **create → classify → close-result → close** sequence as **`AUDIO_FROM_FILE`**, building **`MpAudioData`** from **`bytes`** with the same **honesty** as the file-backed path (raw octets → float32 lanes for binding tests — **not** WAV decode). **`AudioNativeBytesDeferredError`** is removed. Proof bar: **fake-backed** unittest + **`ci` / `repo-safety`** — unchanged in **kind** (structural only). **Local-native** exercise with a real Tasks **`.so` / `.dll`**, if available, is recorded in workspace **`docs/milestones/M22/M22_local_native_proof.md`** — **not** a CI claim.
+
+---
+
+## 11. M23 (Phase D governance closeout)
+
+**M23** records **Phase D — Kernel Extraction** as **closed** in **`docs/aurora.md`** with **Phase D closure criteria**, a **closure matrix** (**M17**–**M22**), and blunt **proved / not proved** language. **Local-native** proof remains **not attempted** — **external** / out-of-scope blocker per **M22** workspace **`docs/milestones/M22/M22_local_native_proof.md`**; closure is **honest** under the **Interpretation B** fallback (**workspace** **`docs/milestones/M22/phase_d_closeout_readiness_audit.md`**) **without** implying a successful real-library run. **No** new ingress authorization beyond governance; **M24** remains a **stub** (no formal phase label in **`docs/aurora.md`** until **M24** locks scope).
