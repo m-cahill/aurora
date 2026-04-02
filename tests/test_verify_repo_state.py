@@ -35,6 +35,7 @@ def _minimal_aurora_md() -> str:
 Governance: `docs/runtime_surface_strategy.md`.
 Substrate: `docs/runtime_substrate.md`.
 Seam framing: `docs/runtime_seam_framing.md`.
+ARB boundary: `docs/aurora_run_bundle_boundary.md`.
 
 """
 
@@ -49,6 +50,14 @@ Placeholder for verifier fixtures.
 
 def _minimal_runtime_seam_framing_md() -> str:
     return """# Runtime seam framing
+
+Placeholder for verifier fixtures.
+
+"""
+
+
+def _minimal_aurora_run_bundle_boundary_md() -> str:
+    return """# ARB boundary
 
 Placeholder for verifier fixtures.
 
@@ -196,6 +205,7 @@ def _substrate_docs_and_src() -> dict[str, str]:
     return {
         "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
         "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
+        "docs/aurora_run_bundle_boundary.md": _minimal_aurora_run_bundle_boundary_md(),
         **_minimal_substrate_src_files(),
         **_minimal_seam_contract_src_files(),
     }
@@ -305,6 +315,7 @@ class TestVerifyRepoState(unittest.TestCase):
 
 Substrate: `docs/runtime_substrate.md`.
 Seam framing: `docs/runtime_seam_framing.md`.
+ARB boundary: `docs/aurora_run_bundle_boundary.md`.
 
 """
             files = {
@@ -453,6 +464,7 @@ jobs:
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
+                "docs/aurora_run_bundle_boundary.md": _minimal_aurora_run_bundle_boundary_md(),
                 **_minimal_substrate_src_files(),
                 **_minimal_seam_contract_src_files(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
@@ -469,6 +481,24 @@ jobs:
                 "docs/aurora.md": _minimal_aurora_md(),
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+                "docs/aurora_run_bundle_boundary.md": _minimal_aurora_run_bundle_boundary_md(),
+                **_minimal_substrate_src_files(),
+                **_minimal_seam_contract_src_files(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_aurora_run_bundle_boundary_doc_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
+                "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
                 **_minimal_substrate_src_files(),
                 **_minimal_seam_contract_src_files(),
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
@@ -486,6 +516,7 @@ jobs:
                 "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
                 "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
                 "docs/runtime_seam_framing.md": _minimal_runtime_seam_framing_md(),
+                "docs/aurora_run_bundle_boundary.md": _minimal_aurora_run_bundle_boundary_md(),
                 "src/aurora/__init__.py": '"""A."""\n',
                 "src/aurora/runtime/__init__.py": '"""R."""\n',
                 **_minimal_seam_contract_src_files(),

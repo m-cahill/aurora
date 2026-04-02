@@ -363,6 +363,12 @@ def verify_repository(repo_root: Path) -> int:
     checks.append({"id": "runtime_seam_framing_doc_exists", "ok": rsf_doc_ok})
     ok &= rsf_doc_ok
 
+    # M25: ARB boundary/spec doc (committed governance surface; not runtime implementation).
+    aurora_run_bundle_boundary = repo_root / "docs" / "aurora_run_bundle_boundary.md"
+    arb_doc_ok = aurora_run_bundle_boundary.is_file()
+    checks.append({"id": "aurora_run_bundle_boundary_doc_exists", "ok": arb_doc_ok})
+    ok &= arb_doc_ok
+
     if readme_ok:
         readme_text = readme.read_text(encoding="utf-8")
         link_ok = _readme_links_to_canonical_doc(readme_text)
@@ -408,6 +414,15 @@ def verify_repository(repo_root: Path) -> int:
             }
         )
         ok &= ref_seam
+
+        ref_arb = "aurora_run_bundle_boundary.md" in body
+        checks.append(
+            {
+                "id": "canonical_doc_references_aurora_run_bundle_boundary",
+                "ok": ref_arb,
+            }
+        )
+        ok &= ref_arb
 
     env_hits = [
         p
