@@ -369,6 +369,12 @@ def verify_repository(repo_root: Path) -> int:
     checks.append({"id": "aurora_run_bundle_boundary_doc_exists", "ok": arb_doc_ok})
     ok &= arb_doc_ok
 
+    # M26: ARB v0.1 canonical format + hashing contract (spec only; not implementation).
+    aurora_run_bundle_v0_spec = repo_root / "docs" / "aurora_run_bundle_v0_spec.md"
+    arb_v0_spec_ok = aurora_run_bundle_v0_spec.is_file()
+    checks.append({"id": "aurora_run_bundle_v0_spec_doc_exists", "ok": arb_v0_spec_ok})
+    ok &= arb_v0_spec_ok
+
     if readme_ok:
         readme_text = readme.read_text(encoding="utf-8")
         link_ok = _readme_links_to_canonical_doc(readme_text)
@@ -423,6 +429,15 @@ def verify_repository(repo_root: Path) -> int:
             }
         )
         ok &= ref_arb
+
+        ref_arb_v0 = "aurora_run_bundle_v0_spec.md" in body
+        checks.append(
+            {
+                "id": "canonical_doc_references_aurora_run_bundle_v0_spec",
+                "ok": ref_arb_v0,
+            }
+        )
+        ok &= ref_arb_v0
 
     env_hits = [
         p
