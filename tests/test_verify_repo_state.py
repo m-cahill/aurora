@@ -196,6 +196,19 @@ def _minimal_seam_contract_src_files() -> dict[str, str]:
     }
 
 
+def _minimal_arb_src_files() -> dict[str, str]:
+    return {
+        "src/aurora/arb/__init__.py": (
+            '"""ARB package stub for verifier fixture."""\n'
+            "from __future__ import annotations\n\n"
+            "X = 1\n"
+        ),
+        "src/aurora/arb/canonical_json.py": '"""C."""\nX = 1\n',
+        "src/aurora/arb/hasher.py": '"""H."""\nX = 1\n',
+        "src/aurora/arb/writer.py": '"""W."""\nX = 1\n',
+    }
+
+
 def _minimal_substrate_src_files() -> dict[str, str]:
     return {
         "src/aurora/__init__.py": '"""A."""\n',
@@ -218,6 +231,7 @@ def _substrate_docs_and_src() -> dict[str, str]:
         "docs/aurora_run_bundle_v0_spec.md": _minimal_aurora_run_bundle_v0_spec_md(),
         **_minimal_substrate_src_files(),
         **_minimal_seam_contract_src_files(),
+        **_minimal_arb_src_files(),
     }
 
 
@@ -595,6 +609,21 @@ ARB boundary: `docs/aurora_run_bundle_boundary.md`.
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             del files["src/aurora/runtime/dispatcher.py"]
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_missing_arb_v0_file_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+            }
+            del files["src/aurora/arb/writer.py"]
             _init_git_repo(root, files)
             rc = verify_repo_state.verify_repository(root)
             self.assertEqual(rc, 1)

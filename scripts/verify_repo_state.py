@@ -37,6 +37,14 @@ SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/audio.py",  # M19 — bounded audio seam (structural presence only)
 )
 
+# M27: ARB v0.1 writer + hashing (stdlib; structural presence only — not semantic validation).
+ARB_V0_REQUIRED_FILES = (
+    "src/aurora/arb/__init__.py",
+    "src/aurora/arb/canonical_json.py",
+    "src/aurora/arb/hasher.py",
+    "src/aurora/arb/writer.py",
+)
+
 # Headings that M01 established as required continuity signals.
 REQUIRED_HEADING_SUBSTRINGS = (
     "Execution Phase Boundaries (locked)",
@@ -152,6 +160,11 @@ def _missing_substrate_files(tracked: list[str]) -> list[str]:
 def _missing_seam_contract_files(tracked: list[str]) -> list[str]:
     tracked_set = set(tracked)
     return [f for f in SEAM_CONTRACT_REQUIRED_FILES if f not in tracked_set]
+
+
+def _missing_arb_v0_files(tracked: list[str]) -> list[str]:
+    tracked_set = set(tracked)
+    return [f for f in ARB_V0_REQUIRED_FILES if f not in tracked_set]
 
 
 def _scan_markdown_links(repo_root: Path, tracked: list[str]) -> list[dict]:
@@ -492,6 +505,17 @@ def verify_repository(repo_root: Path) -> int:
         }
     )
     ok &= seam_files_ok
+
+    missing_arb = _missing_arb_v0_files(tracked)
+    arb_files_ok = not missing_arb
+    checks.append(
+        {
+            "id": "arb_v0_package_files_tracked",
+            "ok": arb_files_ok,
+            "missing": missing_arb,
+        }
+    )
+    ok &= arb_files_ok
 
     mp_import_issues = _mediapipe_import_issues(repo_root, tracked)
     mp_import_ok = not mp_import_issues

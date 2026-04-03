@@ -1,6 +1,6 @@
 # AURORA Run Bundle (ARB) — v0.1 canonical format and deterministic hashing contract
 
-**Status:** **Specification only** (M26). This document **does not** claim that ARB writers, readers, validators, or hash implementations exist in **`src/aurora/`**. It locks an **implementation-ready** contract for **offline / batch** bundles so later milestones can implement tools without renegotiating the on-disk shape, manifest identity, or hashing rules.
+**Status:** **Normative specification** (M26); **M27** adds a **stdlib** **minimal writer** + **hash** helpers in **`src/aurora/arb/`** (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**) — **no** reader, **no** standalone validator, **no** replay tooling. This document locks the **implementation-ready** contract for **offline / batch** bundles; **M27** conforms to it for the **minimal valid** tree only.
 
 **Relationship to prior work:** **`docs/aurora_run_bundle_boundary.md`** (M25) defines **intent**, **ownership**, and a **conceptual** tree. This document **narrows** that into **normative v0.1** rules for a **minimal valid** offline/batch ARB. Where they conflict on detail, **this spec wins** for implementers.
 
@@ -169,8 +169,8 @@ For each **listed** file:
 
 ## 7. Non-goals and implementation gaps (explicit)
 
-- **No** requirement that **`src/aurora/`** implement any of the above in M26.
-- **No** schema validator code, **no** CLI, **no** CI gate beyond repository governance checks for **document presence** (see **`scripts/verify_repo_state.py`**).
+- **M27** adds a **stdlib-only** **minimal writer** and **hash** helpers under **`src/aurora/arb/`** (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**) — **no** reader, **no** standalone validator, **no** replay tooling, **no** CLI, **no** semantic CI gate on bundle contents beyond existing **`scripts/verify_repo_state.py`** structural checks.
+- **No** schema validator beyond what the writer enforces for **minimal valid** v0.1 manifests.
 - **Decode**, **graph execution**, **TFLite**, **native** correctness: **unchanged** from Phase D posture — not claimed by this spec.
 
 ---
@@ -237,4 +237,4 @@ pipeline: audio_classifier_stub
 |------|-------|
 | **Introduced** | M26 — specification only; **not** implementation |
 | **Supersedes** | Nothing — **narrows** M25 boundary doc for v0.1 **offline/batch** |
-| **Next** | M27+ may add **implementation** slices (writer/hash utilities) **only** when explicitly authorized |
+| **Next** | **M27** delivered **stdlib** **writer/hash** in **`src/aurora/arb/`**; **reader** / **validator** / **replay** — future milestones when explicitly authorized |
