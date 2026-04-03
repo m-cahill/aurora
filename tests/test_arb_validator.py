@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import test_arb_writer as spec8_fixtures
 
@@ -13,6 +14,292 @@ from aurora.arb import ArbValidationError, read_arb, validate_arb, write_arb
 
 
 class TestArbValidator(unittest.TestCase):
+    def test_validate_arb_bundle_root_not_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            p = Path(tmp) / "file.txt"
+            p.write_text("x", encoding="utf-8")
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(p)
+            self.assertIn("not a directory", str(ctx.exception))
+
+    def test_validate_arb_manifest_read_oserror(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+
+            _orig_rb = Path.read_bytes
+
+            def _boom(self):
+                if self.name == "manifest.json":
+                    raise OSError("simulated")
+                return _orig_rb(self)
+
+            with patch.object(Path, "read_bytes", _boom):
+                with self.assertRaises(ArbValidationError) as ctx:
+                    validate_arb(root)
+            self.assertIsInstance(ctx.exception.__cause__, OSError)
+
+    def test_validate_arb_manifest_bom(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            raw = (root / "manifest.json").read_bytes()
+            (root / "manifest.json").write_bytes(b"\xef\xbb\xbf" + raw)
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIsNone(ctx.exception.__cause__)
+
+    def test_validate_arb_manifest_invalid_utf8(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            (root / "manifest.json").write_bytes(b"\xff\xfe")
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIsInstance(ctx.exception.__cause__, UnicodeDecodeError)
+
+    def test_validate_arb_manifest_invalid_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            (root / "manifest.json").write_text("{", encoding="utf-8")
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIsInstance(ctx.exception.__cause__, json.JSONDecodeError)
+
+    def test_validate_arb_manifest_not_json_object(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            (root / "manifest.json").write_text("[]", encoding="utf-8")
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("JSON object", str(ctx.exception))
+
+    def test_validate_arb_manifest_fails_minimal_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            m = dict(spec8_fixtures.SPEC8_MANIFEST)
+            m["arb_version"] = "0.2"
+            (root / "manifest.json").write_bytes(json.dumps(m, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIsInstance(ctx.exception.__cause__, ValueError)
+
+    def test_validate_arb_inputs_float_rejected_by_canonicalize(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            bad = {"entries": [{"bad": 1.0}]}
+            (root / "inputs" / "audio_index.json").write_bytes(
+                json.dumps(bad, sort_keys=True).encode("utf-8")
+            )
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("canonical JSON content", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_wrong_arb_version(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["arb_version"] = "0.2"
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("arb_version", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_files_not_array(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"] = {}
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("array", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_wrong_file_count(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"] = h["files"][:2]
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("exactly", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_entry_not_object(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"] = [1, 2, 3, 4, 5]
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("must be an object", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_entry_extra_key(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"][0]["extra"] = "x"
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("exactly", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_path_not_string(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"][0]["path"] = 1
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("strings", str(ctx.exception))
+
+    def test_validate_arb_sha256_manifest_digest_bad_hex(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"][0]["sha256"] = "g" * 64
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("hex", str(ctx.exception).lower())
+
+    def test_validate_arb_sha256_manifest_wrong_path_order(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            hpath = root / "hashes" / "sha256_manifest.json"
+            h = json.loads(hpath.read_text(encoding="utf-8"))
+            h["files"] = list(reversed(h["files"]))
+            hpath.write_bytes(json.dumps(h, sort_keys=True).encode("utf-8"))
+            with self.assertRaises(ArbValidationError) as ctx:
+                validate_arb(root)
+            self.assertIn("sorted", str(ctx.exception).lower())
+
     def test_validate_arb_happy_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
