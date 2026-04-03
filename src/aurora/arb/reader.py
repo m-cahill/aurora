@@ -1,6 +1,7 @@
 """Minimal ARB v0.1 offline/batch bundle reader (spec §3–§4).
 
-Loads the minimal valid tree only. Does **not** verify hashes (see future ``validate_arb``).
+Loads the minimal valid tree only. Does **not** verify hashes — use
+:func:`aurora.arb.validator.validate_arb` separately.
 """
 
 from __future__ import annotations
@@ -74,7 +75,8 @@ def read_arb(bundle_root: str | Path) -> ArbBundle:
 
     Parses JSON per :func:`json.loads` (UTF-8, no BOM). Validates ``manifest.json`` with the
     same rules as :func:`aurora.arb.writer.write_arb`. Does **not** verify ``sha256_manifest``
-    or ``root_hash`` against file contents.
+    or ``root_hash`` against file contents — use :func:`aurora.arb.validator.validate_arb` for
+    integrity checks.
     """
     root = Path(bundle_root).resolve()
     if not root.is_dir():

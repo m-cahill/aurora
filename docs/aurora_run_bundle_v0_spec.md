@@ -1,6 +1,6 @@
 # AURORA Run Bundle (ARB) — v0.1 canonical format and deterministic hashing contract
 
-**Status:** **Normative specification** (M26); **M27**/**M28** add **stdlib** **`src/aurora/arb/`** — **writer** + **hash** helpers (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**) and a **minimal reader** (**`read_arb`**, **`ArbBundle`**) — **no** standalone validator, **no** replay tooling. This document locks the **implementation-ready** contract for **offline / batch** bundles; **M27**/**M28** conform to it for the **minimal valid** tree only.
+**Status:** **Normative specification** (M26); **M27**/**M28**/**M29** add **stdlib** **`src/aurora/arb/`** — **writer** + **hash** helpers (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**), a **minimal reader** (**`read_arb`**, **`ArbBundle`**), and a **standalone programmatic validator** (**`validate_arb`**, **`ArbValidationError`**) — **no** replay tooling, **no** ARB CLI. This document locks the **implementation-ready** contract for **offline / batch** bundles; **M27**/**M28**/**M29** conform to it for the **minimal valid** tree only.
 
 **Relationship to prior work:** **`docs/aurora_run_bundle_boundary.md`** (M25) defines **intent**, **ownership**, and a **conceptual** tree. This document **narrows** that into **normative v0.1** rules for a **minimal valid** offline/batch ARB. Where they conflict on detail, **this spec wins** for implementers.
 
@@ -169,9 +169,26 @@ For each **listed** file:
 
 ## 7. Non-goals and implementation gaps (explicit)
 
-- **M27** adds a **stdlib-only** **minimal writer** and **hash** helpers under **`src/aurora/arb/`** (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**). **M28** adds a **stdlib-only** **minimal reader** (**`read_arb`**, **`ArbBundle`**) — eager load, **no** hash verification (see future **`validate_arb`**). **No** standalone validator, **no** replay tooling, **no** CLI, **no** semantic CI gate on bundle contents beyond existing **`scripts/verify_repo_state.py`** structural checks.
-- **No** schema validator beyond what the writer enforces for **minimal valid** v0.1 manifests.
+- **M27** adds a **stdlib-only** **minimal writer** and **hash** helpers under **`src/aurora/arb/`** (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**). **M28** adds a **stdlib-only** **minimal reader** (**`read_arb`**, **`ArbBundle`**) — eager load, **no** implicit hash verification in the reader API. **M29** adds **`validate_arb(bundle_root)`** and **`ArbValidationError`** — **separate** programmatic verification (**`None`** on success, exception on failure); **no** replay tooling, **no** CLI, **no** semantic CI gate on bundle contents beyond existing **`scripts/verify_repo_state.py`** structural checks.
+- **No** schema validator beyond what the writer enforces for **minimal valid** v0.1 manifests (the **M29** validator additionally checks **integrity** and **minimal** **`sha256_manifest.json`** structure for v0.1 — not a general-purpose schema engine).
 - **Decode**, **graph execution**, **TFLite**, **native** correctness: **unchanged** from Phase D posture — not claimed by this spec.
+
+### 7.1 M29 `validate_arb` — what it proves and does not prove
+
+**Proves (minimal v0.1 offline/batch bundle):**
+
+- Required on-disk layout from §3 exists.
+- **`manifest.json`** passes the same minimal rules as **`write_arb`** and is **canonical JSON** on disk (§4–§5.2).
+- **`graph.yaml`** is UTF-8 **without BOM** (§5.1); hashed as **raw bytes** (§5.3, §6.3).
+- **`inputs/audio_index.json`**, **`segments/segments.json`**, **`predictions/predictions.json`** are **canonical JSON** on disk (§5.2).
+- **`hashes/sha256_manifest.json`** matches the §6.4 structural contract (**`arb_version`**, **`files`** sorted by **`path`**, **`path`** / **`sha256`** entries) and is **canonical JSON** on disk.
+- Per-file **`sha256`** entries match **SHA-256** recomputed from on-disk bytes for each listed payload path (§6.3).
+- **`hashes/root_hash.txt`** (single line, 64 lowercase hex chars) equals **SHA-256** of the **on-disk bytes** of **`hashes/sha256_manifest.json`** (§6.5).
+
+**Does not prove:**
+
+- **Replay** execution, **CLI** tooling, or correctness of **decode** / **graph** / **native** execution.
+- That a caller used **`read_arb`** — **load** (**`read_arb`**) and **verify** (**`validate_arb`**) are intentionally **separate** surfaces; bundles may load without verifying.
 
 ---
 
@@ -237,4 +254,4 @@ pipeline: audio_classifier_stub
 |------|-------|
 | **Introduced** | M26 — specification only; **not** implementation |
 | **Supersedes** | Nothing — **narrows** M25 boundary doc for v0.1 **offline/batch** |
-| **Next** | **M27**/**M28** delivered **stdlib** **writer/hash** + **reader** in **`src/aurora/arb/`**; **standalone validator** (**`validate_arb`**) / **replay** — future milestones when explicitly authorized |
+| **Next** | **M27**/**M28**/**M29** delivered **stdlib** **writer/hash** + **reader** + **`validate_arb`** in **`src/aurora/arb/`**; **replay** / **CLI** — future milestones when explicitly authorized |
