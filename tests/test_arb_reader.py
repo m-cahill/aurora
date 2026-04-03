@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import test_arb_writer as spec8_fixtures
 
@@ -211,6 +212,54 @@ class TestArbReader(unittest.TestCase):
             with self.assertRaises(ValueError) as ctx:
                 read_arb(root)
             self.assertIn("JSON object", str(ctx.exception))
+
+    def test_read_arb_manifest_read_oserror_wrapped(self) -> None:
+        _orig = Path.read_text
+
+        def _fake_read_text(self, *args, **kwargs):
+            if self.name == "manifest.json":
+                raise OSError("simulated manifest read failure")
+            return _orig(self, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            with patch.object(Path, "read_text", _fake_read_text):
+                with self.assertRaises(ValueError) as ctx:
+                    read_arb(root)
+            self.assertIn("manifest.json", str(ctx.exception))
+            self.assertIn("simulated", str(ctx.exception))
+
+    def test_read_arb_root_hash_read_oserror_wrapped(self) -> None:
+        _orig = Path.read_text
+
+        def _fake_read_text(self, *args, **kwargs):
+            if self.name == "root_hash.txt":
+                raise OSError("simulated root_hash read failure")
+            return _orig(self, *args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_arb(
+                root,
+                manifest=dict(spec8_fixtures.SPEC8_MANIFEST),
+                graph_yaml=spec8_fixtures.SPEC8_GRAPH_YAML,
+                inputs=dict(spec8_fixtures.SPEC8_INPUTS),
+                segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
+                predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
+            )
+            with patch.object(Path, "read_text", _fake_read_text):
+                with self.assertRaises(ValueError) as ctx:
+                    read_arb(root)
+            self.assertIn("hashes/root_hash.txt", str(ctx.exception))
+            self.assertIn("simulated", str(ctx.exception))
 
 
 if __name__ == "__main__":
