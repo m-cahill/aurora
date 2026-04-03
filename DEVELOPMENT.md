@@ -85,9 +85,9 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, `docs/runtime_seam_framing.md`, `docs/aurora_run_bundle_boundary.md` (M25), and `docs/aurora_run_bundle_v0_spec.md` (M26), references in `docs/aurora.md` (including `runtime_seam_framing.md`, `aurora_run_bundle_boundary.md`, and `aurora_run_bundle_v0_spec.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21/M22)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, and **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, `docs/runtime_seam_framing.md`, `docs/aurora_run_bundle_boundary.md` (M25), and `docs/aurora_run_bundle_v0_spec.md` (M26), references in `docs/aurora.md` (including `runtime_seam_framing.md`, `aurora_run_bundle_boundary.md`, and `aurora_run_bundle_v0_spec.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21/M22)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, and **M27** **`src/aurora/arb/`** package files (`__init__.py`, `canonical_json.py`, `hasher.py`, `writer.py`), no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
-- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py` (with **`PYTHONPATH=src`**);
+- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py`, and **M27 ARB** tests in `tests/test_arb_*.py` (with **`PYTHONPATH=src`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 
@@ -184,6 +184,17 @@ When green, CI indicates:
 
 - **No** new claims vs M21: decode correctness, graph/TFLite correctness, MediaPipe parity, or real native execution on CI.
 - **No** `VisionTaskBase` / `AudioTaskBase`, ARB, or BirdCLEF harness.
+
+### M27 ARB v0.1 minimal writer and hash (what it proves)
+
+- **First-party** **`src/aurora/arb/`** package (**stdlib-only**): **`canonicalize`** (canonical JSON bytes per **`docs/aurora_run_bundle_v0_spec.md`** §5.2), **`sha256_hex`** / **`compute_root_hash`** (§6), **`write_arb`** (minimal valid **offline/batch** directory tree).
+- **Public exports** from **`aurora.arb`**: **`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`** — **no** reader, **no** standalone validator, **no** replay.
+- **`tests/test_arb_*.py`** pins **SHA-256** digests for the spec §8 illustrative example as a **reference fixture**.
+
+### M27 non-goals (explicit)
+
+- **No** ARB **reader**, **standalone bundle validator**, **replay** tooling, **CLI**, or **transport** wrapper handling.
+- **No** semantic CI gate on ARB contents beyond structural **`verify_repo_state.py`** checks; **no** change to **`src/aurora/runtime/`** seams.
 
 ### What M05 / M06 / M07 / M08 / M09 / M19 / M21 / M22 do not prove
 
