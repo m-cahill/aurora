@@ -217,6 +217,16 @@ When green, CI indicates:
 - **No** **replay** tooling, **ARB CLI**, implicit validation in **`read_arb`**, **`src/aurora/runtime/`** changes, or ARB format redesign.
 - **No** `pytest` migration or third-party runtime dependencies.
 
+### M30 ARB v0.1 minimal CLI validator (what it proves)
+
+- **`src/aurora/arb/__main__.py`** — **`python -m aurora.arb <bundle-root>`** invokes **`validate_arb`** only. **Exit codes:** **0** valid, **1** validation failure (**`ArbValidationError`**), **2** usage error (unsupported argv shape for the documented **`-m`** invocation). Deterministic messages: success on **stdout**; failure prefix + exception text on **stderr**; usage on **stderr**.
+- **`scripts/verify_repo_state.py`** — **`__main__.py`** in **`ARB_V0_REQUIRED_FILES`**.
+- **`tests/test_arb_cli.py`** — in-process **`main(argv)`** tests (no subprocess); **100%** line/branch on **`__main__.py`**.
+
+### M30 non-goals (explicit)
+
+- **No** inspect/read subcommand, **no** subcommands, **no** **`scripts/`** wrapper, **no** **`setuptools`** entry points, **no** replay, **no** **`src/aurora/runtime/`** changes, **no** change to **`validate_arb`** / **`read_arb`** behavior (**`read_arb`** remains library-only and non-validating).
+
 ### What M05 / M06 / M07 / M08 / M09 / M19 / M21 / M22 do not prove
 
 - **MediaPipe** or native runtime correctness — CI does not exercise upstream graphs or tasks.

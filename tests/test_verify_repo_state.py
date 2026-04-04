@@ -208,6 +208,7 @@ def _minimal_arb_src_files() -> dict[str, str]:
         "src/aurora/arb/reader.py": '"""R."""\nX = 1\n',
         "src/aurora/arb/validator.py": '"""V."""\nX = 1\n',
         "src/aurora/arb/writer.py": '"""W."""\nX = 1\n',
+        "src/aurora/arb/__main__.py": '"""CLI."""\nX = 1\n',
     }
 
 
