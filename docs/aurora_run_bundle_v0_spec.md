@@ -194,8 +194,9 @@ For each **listed** file:
 
 **Normative for M30:**
 
-- **Entry:** **`python -m aurora.arb <bundle-root>`** (implementation: **`src/aurora/arb/__main__.py`**). **No** subcommands; **no** **`read_arb`** / inspect surface on the CLI.
-- **Exit codes:** **0** — bundle passes **`validate_arb`**; **1** — **`ArbValidationError`** (invalid bundle or missing root); **2** — usage error (argument shape does not match the supported **`-m aurora.arb`** invocation).
+- **Entry (shell):** **`python -m aurora.arb <bundle-root>`** (implementation: **`src/aurora/arb/__main__.py`**). **No** subcommands; **no** **`read_arb`** / inspect surface on the CLI.
+- **`sys.argv`:** Under this invocation, Python passes **exactly two** arguments to the module: **`argv[0]`** is set by the interpreter (typically the path to the executed **`__main__.py`** entry); **`argv[1]`** is **`<bundle-root>`**. The **`-m`** flag and the module name **`aurora.arb`** are **not** included in **`sys.argv`** — do **not** document or assume a four-element **`[executable, "-m", "aurora.arb", bundle]`** shape.
+- **Exit codes:** **0** — bundle passes **`validate_arb`**; **1** — **`ArbValidationError`** (invalid bundle or missing root); **2** — usage error (anything other than exactly one bundle-root argument after **`argv[0]`**).
 - **Thin wrapper:** delegates to **`validate_arb`** only; does **not** change **`read_arb`** or **`validate_arb`** semantics.
 
 ---

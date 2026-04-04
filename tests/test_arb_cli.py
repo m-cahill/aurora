@@ -24,6 +24,11 @@ class _ExitCalled(Exception):
         self.code = 0 if code is None else code
 
 
+def _argv_two(bundle_root: str) -> list[str]:
+    """Shape Python uses for ``python -m aurora.arb <bundle-root>``: ``[argv0, bundle]``."""
+    return [sys.executable, bundle_root]
+
+
 def _run_main(argv: list[str]) -> tuple[int, str, str]:
     """Invoke ``main(argv)``; return (exit_code, stdout, stderr)."""
     out = io.StringIO()
@@ -53,7 +58,7 @@ class TestArbCli(unittest.TestCase):
                 segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
                 predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
             )
-            code, out, err = _run_main(["python", "-m", "aurora.arb", str(root)])
+            code, out, err = _run_main(_argv_two(str(root)))
             self.assertEqual(code, 0)
             self.assertEqual(out, arb_main._OK)
             self.assertEqual(err, "")
@@ -70,38 +75,26 @@ class TestArbCli(unittest.TestCase):
                 predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
             )
             (root / "manifest.json").write_bytes(b"not canonical json")
-            code, out, err = _run_main(["python", "-m", "aurora.arb", str(root)])
+            code, out, err = _run_main(_argv_two(str(root)))
             self.assertEqual(code, 1)
             self.assertEqual(out, "")
             self.assertTrue(err.startswith(arb_main._FAIL_PREFIX), err)
 
     def test_missing_bundle_arg_exits_two(self) -> None:
-        code, out, err = _run_main(["python", "-m", "aurora.arb"])
+        code, out, err = _run_main([sys.executable])
         self.assertEqual(code, 2)
         self.assertEqual(out, "")
         self.assertEqual(err, arb_main._USAGE)
 
     def test_too_many_args_exits_two(self) -> None:
-        code, out, err = _run_main(
-            ["python", "-m", "aurora.arb", "/tmp/a", "extra"],
-        )
+        code, out, err = _run_main([sys.executable, "/tmp/a", "extra"])
         self.assertEqual(code, 2)
         self.assertEqual(out, "")
         self.assertEqual(err, arb_main._USAGE)
 
-    def test_wrong_minus_m_exits_two(self) -> None:
-        code, out, err = _run_main(["python", "-X", "aurora.arb", "/tmp/x"])
-        self.assertEqual(code, 2)
-        self.assertEqual(err, arb_main._USAGE)
-
-    def test_wrong_module_name_exits_two(self) -> None:
-        code, out, err = _run_main(["python", "-m", "other.pkg", "/tmp/x"])
-        self.assertEqual(code, 2)
-        self.assertEqual(err, arb_main._USAGE)
-
     def test_nonexistent_bundle_root_exits_one(self) -> None:
         code, out, err = _run_main(
-            ["python", "-m", "aurora.arb", "/nonexistent/path/arb-bundle-xyz"],
+            _argv_two("/nonexistent/path/arb-bundle-xyz"),
         )
         self.assertEqual(code, 1)
         self.assertEqual(out, "")
@@ -119,7 +112,7 @@ class TestArbCli(unittest.TestCase):
                 segments=dict(spec8_fixtures.SPEC8_SEGMENTS),
                 predictions=dict(spec8_fixtures.SPEC8_PREDICTIONS),
             )
-            argv = ["python", "-m", "aurora.arb", str(root)]
+            argv = ["/fake/path/to/__main__.py", str(root)]
             out = io.StringIO()
             err = io.StringIO()
 

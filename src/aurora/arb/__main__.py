@@ -17,14 +17,19 @@ _FAIL_PREFIX = "ARB_VALIDATION_FAILED: "
 def main(argv: list[str] | None = None) -> None:
     """Run CLI validation. Uses ``sys.argv`` when *argv* is ``None``.
 
+    For a normal ``python -m aurora.arb <bundle-root>`` run, Python sets ``sys.argv``
+    to two elements: ``argv[0]`` is the path to this ``__main__.py`` (or similar, as
+    the interpreter assigns it); ``argv[1]`` is the bundle root. The strings ``-m``
+    and ``aurora.arb`` do **not** appear in ``sys.argv``.
+
     Exit codes: ``0`` success, ``1`` validation failure, ``2`` usage error.
     """
     args = argv if argv is not None else sys.argv
-    if len(args) != 4 or args[1] != "-m" or args[2] != "aurora.arb":
+    if len(args) != 2:
         sys.stderr.write(_USAGE)
         sys.exit(2)
     try:
-        validate_arb(args[3])
+        validate_arb(args[1])
     except ArbValidationError as exc:
         sys.stderr.write(f"{_FAIL_PREFIX}{exc}\n")
         sys.exit(1)
