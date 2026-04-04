@@ -37,9 +37,10 @@ SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/audio.py",  # M19 — bounded audio seam (structural presence only)
 )
 
-# M27/M28/M29: ARB v0.1 writer + reader + validator + hashing (stdlib; structural presence only).
+# M27–M30: ARB v0.1 writer + reader + validator + CLI + hashing (stdlib; structural only).
 ARB_V0_REQUIRED_FILES = (
     "src/aurora/arb/__init__.py",
+    "src/aurora/arb/__main__.py",
     "src/aurora/arb/canonical_json.py",
     "src/aurora/arb/hasher.py",
     "src/aurora/arb/reader.py",

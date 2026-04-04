@@ -1,6 +1,6 @@
 # AURORA Run Bundle (ARB) — v0.1 canonical format and deterministic hashing contract
 
-**Status:** **Normative specification** (M26); **M27**/**M28**/**M29** add **stdlib** **`src/aurora/arb/`** — **writer** + **hash** helpers (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**), a **minimal reader** (**`read_arb`**, **`ArbBundle`**), and a **standalone programmatic validator** (**`validate_arb`**, **`ArbValidationError`**) — **no** replay tooling, **no** ARB CLI. This document locks the **implementation-ready** contract for **offline / batch** bundles; **M27**/**M28**/**M29** conform to it for the **minimal valid** tree only.
+**Status:** **Normative specification** (M26); **M27**/**M28**/**M29**/**M30** add **stdlib** **`src/aurora/arb/`** — **writer** + **hash** helpers (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**), a **minimal reader** (**`read_arb`**, **`ArbBundle`**), a **standalone programmatic validator** (**`validate_arb`**, **`ArbValidationError`**), and a **validate-only CLI** (**`python -m aurora.arb <bundle-root>`** via **`__main__.py`**) — **no** replay tooling, **no** inspect/read CLI, **no** subcommands. This document locks the **implementation-ready** contract for **offline / batch** bundles; **M27**/**M28**/**M29**/**M30** conform to it for the **minimal valid** tree only.
 
 **Relationship to prior work:** **`docs/aurora_run_bundle_boundary.md`** (M25) defines **intent**, **ownership**, and a **conceptual** tree. This document **narrows** that into **normative v0.1** rules for a **minimal valid** offline/batch ARB. Where they conflict on detail, **this spec wins** for implementers.
 
@@ -169,7 +169,7 @@ For each **listed** file:
 
 ## 7. Non-goals and implementation gaps (explicit)
 
-- **M27** adds a **stdlib-only** **minimal writer** and **hash** helpers under **`src/aurora/arb/`** (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**). **M28** adds a **stdlib-only** **minimal reader** (**`read_arb`**, **`ArbBundle`**) — eager load, **no** implicit hash verification in the reader API. **M29** adds **`validate_arb(bundle_root)`** and **`ArbValidationError`** — **separate** programmatic verification (**`None`** on success, exception on failure); **no** replay tooling, **no** CLI, **no** semantic CI gate on bundle contents beyond existing **`scripts/verify_repo_state.py`** structural checks.
+- **M27** adds a **stdlib-only** **minimal writer** and **hash** helpers under **`src/aurora/arb/`** (**`write_arb`**, **`canonicalize`**, **`sha256_hex`**, **`compute_root_hash`**). **M28** adds a **stdlib-only** **minimal reader** (**`read_arb`**, **`ArbBundle`**) — eager load, **no** implicit hash verification in the reader API. **M29** adds **`validate_arb(bundle_root)`** and **`ArbValidationError`** — **separate** programmatic verification (**`None`** on success, exception on failure). **M30** adds **`python -m aurora.arb <bundle-root>`** — **validate-only** shell entry (**exit** **0** / **1** / **2**); **no** inspect/read, **no** subcommands, **no** replay tooling, **no** semantic CI gate on bundle contents beyond existing **`scripts/verify_repo_state.py`** structural checks.
 - **No** schema validator beyond what the writer enforces for **minimal valid** v0.1 manifests (the **M29** validator additionally checks **integrity** and **minimal** **`sha256_manifest.json`** structure for v0.1 — not a general-purpose schema engine).
 - **Decode**, **graph execution**, **TFLite**, **native** correctness: **unchanged** from Phase D posture — not claimed by this spec.
 
@@ -187,8 +187,17 @@ For each **listed** file:
 
 **Does not prove:**
 
-- **Replay** execution, **CLI** tooling, or correctness of **decode** / **graph** / **native** execution.
+- **Replay** execution, **inspect/read** bundle CLI, or correctness of **decode** / **graph** / **native** execution. (**M30** CLI is **validate-only**, not general bundle tooling.)
 - That a caller used **`read_arb`** — **load** (**`read_arb`**) and **verify** (**`validate_arb`**) are intentionally **separate** surfaces; bundles may load without verifying.
+
+### 7.2 M30 CLI — `python -m aurora.arb <bundle-root>`
+
+**Normative for M30:**
+
+- **Entry (shell):** **`python -m aurora.arb <bundle-root>`** (implementation: **`src/aurora/arb/__main__.py`**). **No** subcommands; **no** **`read_arb`** / inspect surface on the CLI.
+- **`sys.argv`:** Under this invocation, Python passes **exactly two** arguments to the module: **`argv[0]`** is set by the interpreter (typically the path to the executed **`__main__.py`** entry); **`argv[1]`** is **`<bundle-root>`**. The **`-m`** flag and the module name **`aurora.arb`** are **not** included in **`sys.argv`** — do **not** document or assume a four-element **`[executable, "-m", "aurora.arb", bundle]`** shape.
+- **Exit codes:** **0** — bundle passes **`validate_arb`**; **1** — **`ArbValidationError`** (invalid bundle or missing root); **2** — usage error (anything other than exactly one bundle-root argument after **`argv[0]`**).
+- **Thin wrapper:** delegates to **`validate_arb`** only; does **not** change **`read_arb`** or **`validate_arb`** semantics.
 
 ---
 
@@ -254,4 +263,4 @@ pipeline: audio_classifier_stub
 |------|-------|
 | **Introduced** | M26 — specification only; **not** implementation |
 | **Supersedes** | Nothing — **narrows** M25 boundary doc for v0.1 **offline/batch** |
-| **Next** | **M27**/**M28**/**M29** delivered **stdlib** **writer/hash** + **reader** + **`validate_arb`** in **`src/aurora/arb/`**; **replay** / **CLI** — future milestones when explicitly authorized |
+| **Next** | **M27**/**M28**/**M29**/**M30** delivered **stdlib** **writer/hash** + **reader** + **`validate_arb`** + **validate-only CLI** in **`src/aurora/arb/`**; **replay** / broader tooling — future milestones when explicitly authorized |
