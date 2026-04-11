@@ -2,7 +2,7 @@
 
 **Status:** Canonical committed record of the first tracked runtime substrate  
 **Role:** States what exists under `src/aurora/`, provenance rules, and explicit non-claims.  
-**Last updated:** 2026-04-10 (M05 baseline; current phase and milestone posture in [`docs/aurora.md`](aurora.md)).
+**Last updated:** 2026-04-10 (M05 baseline; packaging install path updated **M33**; current phase and milestone posture in [`docs/aurora.md`](aurora.md)).
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Path | Role |
 |------|------|
-| **`src/aurora/`** | First-party Python package root (`PYTHONPATH=src` for imports). |
+| **`src/aurora/`** | First-party Python package root. Prefer **`pip install -e .`** from the repo root (see [`pyproject.toml`](../pyproject.toml)); **`PYTHONPATH=src`** remains a compatibility path (including CI). |
 | **`src/aurora/__init__.py`** | Package root marker. |
 | **`src/aurora/runtime/__init__.py`** | Runtime subpackage; re-exports the minimal substrate API. |
 | **`src/aurora/runtime/surface.py`** | Substrate metadata dataclass and `get_runtime_substrate_metadata()`. |
@@ -31,7 +31,7 @@ Architectural learning from MediaPipe is allowed elsewhere; **code transfer from
 
 ## 3. What this substrate proves
 
-- The tracked repository contains an **importable** first-party package at `aurora` (with `PYTHONPATH=src`).
+- The tracked repository contains an **importable** first-party package at `aurora` (editable install or `PYTHONPATH=src`).
 - A **stable, reviewable** metadata contract exists (`RuntimeSubstrateMetadata` / `get_runtime_substrate_metadata()`).
 - CI and tests can **truthfully** assert importability and metadata — not application or MediaPipe correctness.
 

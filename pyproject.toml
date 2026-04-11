@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aurora"
+version = "0.1.0"
+description = "Acoustic Unified Runtime for Observable, Replayable Acoustics — governed runtime substrate and ARB v0.1 (stdlib-only runtime)."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aurora = ["py.typed"]

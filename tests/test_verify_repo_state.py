@@ -226,6 +226,31 @@ def _minimal_substrate_src_files() -> dict[str, str]:
     }
 
 
+def _m33_packaging_fixture_files() -> dict[str, str]:
+    """Minimal M33 packaging / hygiene files so verifier fixtures stay structurally valid."""
+    return {
+        "LICENSE": "Apache License\nVersion 2.0\nStub license text for verifier tests.\n",
+        "pyproject.toml": (
+            "[build-system]\n"
+            'requires = ["setuptools>=68.0"]\n'
+            'build-backend = "setuptools.build_meta"\n'
+            "[project]\n"
+            'name = "aurora"\n'
+            'version = "0.1.0"\n'
+            'requires-python = ">=3.11"\n'
+            "[tool.setuptools.packages.find]\n"
+            'where = ["src"]\n'
+            "[tool.setuptools.package-data]\n"
+            'aurora = ["py.typed"]\n'
+        ),
+        "src/aurora/py.typed": "",
+        ".python-version": "3.11\n",
+        "CONTRIBUTING.md": "# Contributing\n\nSee DEVELOPMENT.md.\n",
+        "SECURITY.md": "# Security\n\nReport via GitHub.\n",
+        "CODE_OF_CONDUCT.md": "# Conduct\n\nContributor Covenant.\n",
+    }
+
+
 def _substrate_docs_and_src() -> dict[str, str]:
     return {
         "docs/runtime_substrate.md": _minimal_runtime_substrate_md(),
@@ -235,6 +260,7 @@ def _substrate_docs_and_src() -> dict[str, str]:
         **_minimal_substrate_src_files(),
         **_minimal_seam_contract_src_files(),
         **_minimal_arb_src_files(),
+        **_m33_packaging_fixture_files(),
     }
 
 
@@ -627,6 +653,51 @@ ARB boundary: `docs/aurora_run_bundle_boundary.md`.
                 ".github/workflows/ci.yml": _minimal_ci_workflow(),
             }
             del files["src/aurora/arb/writer.py"]
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_tracked_docs_prompts_path_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+                "docs/prompts/secret.md": "x\n",
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_tracked_docs_manuals_path_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+                "docs/manuals/internal.md": "x\n",
+            }
+            _init_git_repo(root, files)
+            rc = verify_repo_state.verify_repository(root)
+            self.assertEqual(rc, 1)
+
+    def test_tracked_docs_milestones_path_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            files = {
+                "README.md": _minimal_readme(),
+                "docs/aurora.md": _minimal_aurora_md(),
+                "docs/runtime_surface_strategy.md": _minimal_runtime_surface_md(),
+                **_substrate_docs_and_src(),
+                ".github/workflows/ci.yml": _minimal_ci_workflow(),
+                "docs/milestones/M99/plan.md": "x\n",
+            }
             _init_git_repo(root, files)
             rc = verify_repo_state.verify_repository(root)
             self.assertEqual(rc, 1)
