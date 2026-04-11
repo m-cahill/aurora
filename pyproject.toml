@@ -15,3 +15,11 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 aurora = ["py.typed"]
+
+# M34 — strict static typing for first-party `src/aurora/` only (stdlib runtime; no tests/scripts).
+# Run: `mypy src/aurora` (CI and DEVELOPMENT.md); config applies to checked paths.
+[tool.mypy]
+python_version = "3.11"
+strict = true
+explicit_package_bases = true
+mypy_path = ["src"]

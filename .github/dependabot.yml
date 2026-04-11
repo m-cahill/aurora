@@ -1,0 +1,12 @@
+# M34 — supply-chain hygiene: weekly updates for pinned dev tooling and GitHub Actions SHAs.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

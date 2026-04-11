@@ -36,6 +36,26 @@ Results are written under `artifacts/` (`repo_verification.json`, `verification_
 ruff check scripts tests src
 ```
 
+## Run Mypy locally (strict; first-party `src/aurora` only — M34)
+
+After **`pip install -r requirements-dev.txt`** and **`pip install -e .`** (so `import aurora` resolves like CI):
+
+```bash
+mypy src/aurora
+```
+
+Configuration is in **`pyproject.toml`** (`[tool.mypy]` — **strict**, **`mypy_path`** includes **`src`**). Tests and `scripts/` are **not** type-checked by default.
+
+## Run pip-audit locally (full environment — M34)
+
+After installing dev tools and the package (**`pip install -r requirements-dev.txt`** and **`pip install -e .`**), audit **everything installed in the active environment** (the same surface CI enforces):
+
+```bash
+pip-audit
+```
+
+Editable **`aurora`** may appear as “not found on PyPI” — expected for a local install; vulnerabilities in **other** installed packages must still be **zero** for a clean pass.
+
 ## Run tests locally (including runtime substrate)
 
 After **`pip install -e .`**, run tests **without** setting **`PYTHONPATH`**:
@@ -96,8 +116,10 @@ When green, CI indicates:
 
 - repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, `docs/runtime_seam_framing.md`, `docs/aurora_run_bundle_boundary.md` (M25), and `docs/aurora_run_bundle_v0_spec.md` (M26), references in `docs/aurora.md` (including `runtime_seam_framing.md`, `aurora_run_bundle_boundary.md`, and `aurora_run_bundle_v0_spec.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21/M22)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, and **M27**/**M29** **`src/aurora/arb/`** package files (`__init__.py`, `canonical_json.py`, `hasher.py`, `reader.py`, `validator.py`, `writer.py`), **M33** **`LICENSE`**, **`pyproject.toml`**, **`src/aurora/py.typed`**, **`.python-version`**, **`CONTRIBUTING.md`**, **`SECURITY.md`**, **`CODE_OF_CONDUCT.md`**, no tracked paths under **`docs/prompts/`**, **`docs/manuals/`**, or **`docs/milestones/`** (workspace-private governance patterns), no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
+- **Mypy** in **strict** mode on **`src/aurora/`** only (**M34** — after **`pip install -e .`** so imports match local development);
 - **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py`, and **M27/M28/M29 ARB** tests in `tests/test_arb_*.py` (CI sets **`PYTHONPATH=src`** for coverage; locally prefer **`pip install -e .`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
+- **`pip-audit`** on the **full installed** environment after dev + editable install (**M34** — must report **no known vulnerabilities** in audited PyPI packages; pinned **`setuptools`** avoids vulnerable stdlib-venv defaults);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 
 ### M05 substrate (what it proves)
