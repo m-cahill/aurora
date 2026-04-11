@@ -75,7 +75,7 @@ Dependency direction is **one-way**: AURORA does not depend on ORNITHOS or PANTA
 
 ## Proof posture
 
-Required GitHub check: **`ci` / `repo-safety`**. When green, CI reflects the **declared** bar in [`DEVELOPMENT.md`](DEVELOPMENT.md): verifier, Ruff, `unittest` with coverage, and **100% line / 100% branch** on `src/aurora/` per project rules. Green CI does **not** override the explicit non-proofs above.
+Required GitHub check: **`ci` / `repo-safety`**. When green, CI reflects the **declared** bar in [`DEVELOPMENT.md`](DEVELOPMENT.md): verifier, Ruff, **Mypy** (strict on `src/aurora/`), `unittest` with coverage, **100% line / 100% branch** on `src/aurora/`, and **`pip-audit`** on the installed dev environment (**M34**). Green CI does **not** override the explicit non-proofs above.
 
 ## Contributing and governance
 
