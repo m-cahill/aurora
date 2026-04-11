@@ -2,7 +2,7 @@
 
 **Status:** Canonical committed record of the first tracked runtime substrate  
 **Role:** States what exists under `src/aurora/`, provenance rules, and explicit non-claims.  
-**Last updated:** 2026-03-26 (M05)
+**Last updated:** 2026-04-10 (M05 baseline; current phase and milestone posture in [`docs/aurora.md`](aurora.md)).
 
 ---
 

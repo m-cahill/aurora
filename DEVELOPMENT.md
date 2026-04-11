@@ -1,6 +1,6 @@
 # AURORA — development workflow
 
-This file describes **what exists today** in the `aurora/` repository: governance checks, the first-party runtime substrate under `src/aurora/`, lint, and tests. It is not a full roadmap for MediaPipe fork work (that lives in workspace context docs).
+This file describes **what exists today** in the `aurora/` repository: governance checks, the first-party runtime substrate under `src/aurora/`, lint, and tests. For orientation and boundaries (mental model, non-proofs, doc map), see [`docs/AURORA_OPERATING_MANUAL.md`](docs/AURORA_OPERATING_MANUAL.md). It is not a full roadmap for MediaPipe fork work (that lives in workspace context docs).
 
 ## Prerequisites
 

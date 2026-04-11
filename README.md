@@ -2,10 +2,79 @@
 
 **Acoustic Unified Runtime for Observable, Replayable Acoustics** — a governed acoustic runtime and MediaPipe refactor program, tracked as a Foundry-aligned case study.
 
-This repository (`aurora/`) is the **only tracked AURORA git repo** in the workspace. The canonical project record is **[`docs/aurora.md`](docs/aurora.md)** — start there for boundaries, phases, roadmap, and milestone status.
+## What AURORA is
 
-The first-party Python package lives under **`src/aurora/`** (see **`docs/runtime_substrate.md`**). Import it with `PYTHONPATH=src` as described in **`DEVELOPMENT.md`**.
+AURORA turns a high-entropy, real-world perception stack into a **deterministic, artifact-bound, replayable** audio system with **explicit Python/native seams**, auditable outputs, and honest scope boundaries. It is **not** a casual whole-repo rewrite of MediaPipe and **not** a backdoor for copying upstream implementation into Foundry core.
 
-For **local development** (tooling, verifier, tests, and what CI does or does not prove), see **[`DEVELOPMENT.md`](DEVELOPMENT.md)**.
+This repository (`aurora/`) is the **only** tracked AURORA git repository in the workspace. The **canonical project record** is [`docs/aurora.md`](docs/aurora.md). For **practical day-to-day use** (imports, tests, verification), see [`docs/AURORA_OPERATING_MANUAL.md`](docs/AURORA_OPERATING_MANUAL.md).
 
-A separate **`mediapipe/`** directory in the workspace (when present) is a **read-only reference clone** for architectural study; it is not part of this repository and must not be modified as part of AURORA work.
+## Current status
+
+**v0.1 complete** (through milestone **M31**). Phases **A–D** are **closed** in the committed record. Default posture for **runtime code** under `src/aurora/` is **maintenance-only** unless a downstream-driven need explicitly authorizes new work.
+
+An **explicit post-M31 public-release hardening tranche** (M32–M35) improves documentation, packaging readiness, and release hygiene **without** reopening runtime expansion or native proof by default. See [`docs/aurora.md`](docs/aurora.md).
+
+## Why this project exists
+
+- Prove **Foundry-style** discipline on a **real** codebase (not a toy demo).
+- Preserve MediaPipe’s strengths while **governing** seams, dependencies, and proof claims.
+- Provide a **stable handoff surface** for downstream bioacoustic work (ORNITHOS, PANTANAL-1) without coupling competition-only logic into the runtime repo.
+
+## Public scope and explicit non-goals
+
+**In scope for this repo (as delivered and bounded):**
+
+- Governed **runtime substrate**: `Dispatcher`, `LibraryLoader`, `SharedLibraryLoader`, bounded `AuroraImage` / `AuroraAudio`, structural `NativeAudioDispatcher` and ctypes bindings (see [`DEVELOPMENT.md`](DEVELOPMENT.md) for what CI proves).
+- **ARB v0.1** (AURORA Run Bundle): normative docs, stdlib **write / read / validate**, `python -m aurora.arb`, hashing and canonical JSON per spec.
+
+**Not claimed by CI or docs:**
+
+- Decode correctness for real audio codecs.
+- Graph / TFLite / MediaPipe **application** parity.
+- Real native Tasks library execution on CI or proof of correctness on a host binary.
+- BirdCLEF submission harness, Kaggle-only packaging, or ORNITHOS/PANTANAL-1 implementation **inside** this repo (those belong downstream unless they also improve the **generic** runtime).
+
+## Installation and local development
+
+- **Python 3.11** (matches CI).
+- The first-party package lives under **`src/aurora/`**. Set **`PYTHONPATH=src`** (or the Windows equivalent) so imports match CI. See **[`DEVELOPMENT.md`](DEVELOPMENT.md)** for verifier, Ruff, tests, and coverage commands.
+
+There is **no** `pyproject.toml` in-repo as of v0.1; packaging is planned as a later tranche milestone (see [`docs/aurora.md`](docs/aurora.md)).
+
+## Documentation map
+
+| Document | Role |
+|----------|------|
+| [`docs/aurora.md`](docs/aurora.md) | Canonical repo record: phases, milestones, boundaries, proof posture. |
+| [`docs/AURORA_VISION.md`](docs/AURORA_VISION.md) | North-star vision and program framing. |
+| [`docs/AURORA_OPERATING_MANUAL.md`](docs/AURORA_OPERATING_MANUAL.md) | How to use and verify the repo today. |
+| [`docs/milestone_summaries/README.md`](docs/milestone_summaries/README.md) | Public narrative summaries for milestones **M01–M31** (index + one file per milestone). |
+| [`DEVELOPMENT.md`](DEVELOPMENT.md) | Tooling, CI behavior, and milestone-specific “what CI proves.” |
+| [`docs/runtime_substrate.md`](docs/runtime_substrate.md) | First-party package layout and provenance. |
+| [`docs/runtime_seam_framing.md`](docs/runtime_seam_framing.md) | Dispatcher / loader seams and async honesty. |
+| [`docs/aurora_run_bundle_boundary.md`](docs/aurora_run_bundle_boundary.md) / [`docs/aurora_run_bundle_v0_spec.md`](docs/aurora_run_bundle_v0_spec.md) | ARB boundary and v0.1 on-disk spec. |
+
+## Repository boundary rules
+
+- **Only `aurora/` is a git repository** for AURORA work; do not initialize git at the workspace root.
+- A sibling **`mediapipe/`** directory (when present) is a **read-only reference clone** — do not modify it as part of AURORA changes.
+- **Do not** copy MediaPipe source from `mediapipe/` into `aurora/`. Architectural learning is allowed; code transfer is not.
+
+## Downstream: ORNITHOS and PANTANAL-1
+
+**ORNITHOS** is the intended **domain model stack** (training, scoring, representations) that **consumes** released AURORA surfaces.
+
+**PANTANAL-1** is the intended **BirdCLEF / deployment** narrative that may depend on AURORA and ORNITHOS artifacts.
+
+Dependency direction is **one-way**: AURORA does not depend on ORNITHOS or PANTANAL-1. See [`docs/aurora.md`](docs/aurora.md) for the full charter.
+
+## Proof posture
+
+Required GitHub check: **`ci` / `repo-safety`**. When green, CI reflects the **declared** bar in [`DEVELOPMENT.md`](DEVELOPMENT.md): verifier, Ruff, `unittest` with coverage, and **100% line / 100% branch** on `src/aurora/` per project rules. Green CI does **not** override the explicit non-proofs above.
+
+## Contributing and governance
+
+- Prefer **small, reversible** changes with milestone-style acceptance criteria; the project record in [`docs/aurora.md`](docs/aurora.md) is the source of truth for what was proved and what was not.
+- For **contribution workflow** (PRs, branch protection expectations), see [`DEVELOPMENT.md`](DEVELOPMENT.md) and the operating manual.
+
+A separate **`docs/`** tree at the **workspace** root (outside this repo) may hold local governance; it must **not** be committed into `aurora/` unless you intentionally add public material here.
