@@ -7,12 +7,17 @@ This file describes **what exists today** in the `aurora/` repository: governanc
 - **Python 3.11** (matches CI).
 - **Git** (the verifier uses `git ls-files`).
 
-## Install dev tools
+## Install dev tools and the package (editable)
+
+From the repository root (`aurora/`):
 
 ```bash
 python -m pip install --upgrade pip
 pip install -r requirements-dev.txt
+pip install -e .
 ```
+
+**Editable install** (`pip install -e .`) is the **preferred** way to make `import aurora` work locally without manual `PYTHONPATH` configuration. Dev tools remain listed in **`requirements-dev.txt`** (M33 does not move them into `pyproject.toml`).
 
 ## Run the repository verifier locally
 
@@ -33,16 +38,22 @@ ruff check scripts tests src
 
 ## Run tests locally (including runtime substrate)
 
-Substrate tests import the `aurora` package from `src/`. Set **`PYTHONPATH=src`** (or the Windows equivalent) so imports resolve the same way as in CI.
+After **`pip install -e .`**, run tests **without** setting **`PYTHONPATH`**:
 
-**Linux / macOS:**
+```bash
+python -m unittest discover -s tests -v
+```
+
+**Compatibility (CI and ad hoc):** GitHub Actions sets **`PYTHONPATH=src`** for the coverage step. You can still use that locally if you have not installed the package in editable mode.
+
+**Linux / macOS (legacy `PYTHONPATH`):**
 
 ```bash
 export PYTHONPATH=src
 python -m unittest discover -s tests -v
 ```
 
-**Windows (PowerShell):**
+**Windows (PowerShell, legacy `PYTHONPATH`):**
 
 ```powershell
 $env:PYTHONPATH = "src"
@@ -53,10 +64,9 @@ python -m unittest discover -s tests -v
 
 From the repository root, with dev tools installed (`pip install -r requirements-dev.txt`):
 
-**Linux / macOS:**
+**Linux / macOS** (after **`pip install -e .`**, or with **`export PYTHONPATH=src`**):
 
 ```bash
-export PYTHONPATH=src
 coverage erase
 coverage run -m unittest discover -s tests -v
 coverage report
@@ -64,10 +74,9 @@ coverage json -o artifacts/coverage.json
 python scripts/check_coverage_thresholds.py
 ```
 
-**Windows (PowerShell):**
+**Windows (PowerShell)** (after **`pip install -e .`**, or with **`$env:PYTHONPATH = "src"`**):
 
 ```powershell
-$env:PYTHONPATH = "src"
 coverage erase
 coverage run -m unittest discover -s tests -v
 coverage report
@@ -85,9 +94,9 @@ The required GitHub status check is **`ci / repo-safety`** (workflow `ci`, job `
 
 When green, CI indicates:
 
-- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, `docs/runtime_seam_framing.md`, `docs/aurora_run_bundle_boundary.md` (M25), and `docs/aurora_run_bundle_v0_spec.md` (M26), references in `docs/aurora.md` (including `runtime_seam_framing.md`, `aurora_run_bundle_boundary.md`, and `aurora_run_bundle_v0_spec.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21/M22)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, and **M27**/**M29** **`src/aurora/arb/`** package files (`__init__.py`, `canonical_json.py`, `hasher.py`, `reader.py`, `validator.py`, `writer.py`), no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
+- repository layout and documentation anchors enforced by `scripts/verify_repo_state.py` (README link to `docs/aurora.md`, required headings, presence of `docs/runtime_surface_strategy.md`, `docs/runtime_substrate.md`, `docs/runtime_seam_framing.md`, `docs/aurora_run_bundle_boundary.md` (M25), and `docs/aurora_run_bundle_v0_spec.md` (M26), references in `docs/aurora.md` (including `runtime_seam_framing.md`, `aurora_run_bundle_boundary.md`, and `aurora_run_bundle_v0_spec.md`), tracked substrate and **M06 seam contract** files plus **`src/aurora/runtime/errors.py` (M13)**, **`src/aurora/runtime/dispatch_tokens.py` (M14/M19)**, **`src/aurora/runtime/image_dispatch.py` (M15)**, **`src/aurora/runtime/audio_dispatch.py` (M19)**, **`src/aurora/runtime/audio_native_bindings.py` (M21)**, **`src/aurora/runtime/native_audio_dispatcher.py` (M21/M22)**, **`src/aurora/runtime/shared_library_loader.py` (M07)**, **`src/aurora/runtime/image.py` (M08)**, **`src/aurora/runtime/audio.py` (M19)** under `src/aurora/runtime/`, and **M27**/**M29** **`src/aurora/arb/`** package files (`__init__.py`, `canonical_json.py`, `hasher.py`, `reader.py`, `validator.py`, `writer.py`), **M33** **`LICENSE`**, **`pyproject.toml`**, **`src/aurora/py.typed`**, **`.python-version`**, **`CONTRIBUTING.md`**, **`SECURITY.md`**, **`CODE_OF_CONDUCT.md`**, no tracked paths under **`docs/prompts/`**, **`docs/manuals/`**, or **`docs/milestones/`** (workspace-private governance patterns), no `mediapipe` imports under `src/aurora/`, no tracked `.env`, workflow policy including full SHA pins for external Actions, no `*-latest` runners on enforcement workflows, and the stable `ci` / `repo-safety` identity);
 - **Ruff** on `scripts/`, `tests/`, and `src/`;
-- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py`, and **M27/M28/M29 ARB** tests in `tests/test_arb_*.py` (with **`PYTHONPATH=src`**);
+- **stdlib `unittest`** for the verifier, **runtime substrate** import/metadata tests, **M09 composed runtime smoke tests** (image) and **M19 audio smoke tests** in `tests/test_runtime_smoke.py`, and **M27/M28/M29 ARB** tests in `tests/test_arb_*.py` (CI sets **`PYTHONPATH=src`** for coverage; locally prefer **`pip install -e .`**);
 - **line and branch coverage** for **`src/aurora/`** via **`coverage run`** (with **`branch = True`**) + **`coverage report`** + **`coverage json`**, then **`scripts/check_coverage_thresholds.py`** for **separate** line and branch regression floors (JSON under **`artifacts/coverage.json`** on CI);
 - **bytecode compile** sanity for `scripts/`, `tests/`, and `src/`.
 

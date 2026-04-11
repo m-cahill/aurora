@@ -37,6 +37,18 @@ SEAM_CONTRACT_REQUIRED_FILES = (
     "src/aurora/runtime/audio.py",  # M19 — bounded audio seam (structural presence only)
 )
 
+# M33: packaging surface + public hygiene files (structural presence only; not legal review).
+# LICENSE: Apache-2.0 text already present before M33; keep tracked.
+PACKAGING_AND_PUBLIC_HYGIENE_REQUIRED_FILES = (
+    "LICENSE",
+    "pyproject.toml",
+    "src/aurora/py.typed",
+    ".python-version",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "CODE_OF_CONDUCT.md",
+)
+
 # M27–M30: ARB v0.1 writer + reader + validator + CLI + hashing (stdlib; structural only).
 ARB_V0_REQUIRED_FILES = (
     "src/aurora/arb/__init__.py",
@@ -168,6 +180,25 @@ def _missing_seam_contract_files(tracked: list[str]) -> list[str]:
 def _missing_arb_v0_files(tracked: list[str]) -> list[str]:
     tracked_set = set(tracked)
     return [f for f in ARB_V0_REQUIRED_FILES if f not in tracked_set]
+
+
+def _missing_packaging_hygiene_files(tracked: list[str]) -> list[str]:
+    tracked_set = set(tracked)
+    return [f for f in PACKAGING_AND_PUBLIC_HYGIENE_REQUIRED_FILES if f not in tracked_set]
+
+
+def _forbidden_private_internal_paths(tracked: list[str]) -> list[str]:
+    """Disallow workspace-style private governance paths inside the public repo tree."""
+    hits: list[str] = []
+    for p in tracked:
+        norm = p.replace("\\", "/")
+        if norm == "docs/prompts" or norm.startswith("docs/prompts/"):
+            hits.append(p)
+        elif norm == "docs/manuals" or norm.startswith("docs/manuals/"):
+            hits.append(p)
+        elif norm == "docs/milestones" or norm.startswith("docs/milestones/"):
+            hits.append(p)
+    return hits
 
 
 def _scan_markdown_links(repo_root: Path, tracked: list[str]) -> list[dict]:
@@ -519,6 +550,28 @@ def verify_repository(repo_root: Path) -> int:
         }
     )
     ok &= arb_files_ok
+
+    missing_pkg = _missing_packaging_hygiene_files(tracked)
+    pkg_files_ok = not missing_pkg
+    checks.append(
+        {
+            "id": "packaging_and_public_hygiene_files_tracked",
+            "ok": pkg_files_ok,
+            "missing": missing_pkg,
+        }
+    )
+    ok &= pkg_files_ok
+
+    private_path_hits = _forbidden_private_internal_paths(tracked)
+    private_paths_ok = not private_path_hits
+    checks.append(
+        {
+            "id": "no_private_workspace_style_paths_tracked",
+            "ok": private_paths_ok,
+            "paths": private_path_hits,
+        }
+    )
+    ok &= private_paths_ok
 
     mp_import_issues = _mediapipe_import_issues(repo_root, tracked)
     mp_import_ok = not mp_import_issues

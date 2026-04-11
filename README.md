@@ -36,10 +36,12 @@ An **explicit post-M31 public-release hardening tranche** (M32–M35) improves d
 
 ## Installation and local development
 
-- **Python 3.11** (matches CI).
-- The first-party package lives under **`src/aurora/`**. Set **`PYTHONPATH=src`** (or the Windows equivalent) so imports match CI. See **[`DEVELOPMENT.md`](DEVELOPMENT.md)** for verifier, Ruff, tests, and coverage commands.
+- **Python 3.11** (matches [`.python-version`](.python-version)).
+- From the repository root: **`pip install -r requirements-dev.txt`** then **`pip install -e .`** so the **`aurora`** package is importable without setting **`PYTHONPATH`**. See **[`DEVELOPMENT.md`](DEVELOPMENT.md)** for verifier, Ruff, tests, and coverage commands.
 
-There is **no** `pyproject.toml` in-repo as of v0.1; packaging is planned as a later tranche milestone (see [`docs/aurora.md`](docs/aurora.md)).
+**Compatibility:** you can still run with **`PYTHONPATH=src`** (as CI does) if you prefer not to install the package in editable mode.
+
+Packaging metadata is declared in **[`pyproject.toml`](pyproject.toml)** (version **0.1.0**, setuptools, `src/` layout). There are **no** setuptools **console-script** entry points — use **`python -m aurora.arb`** for the ARB CLI.
 
 ## Documentation map
 
@@ -49,6 +51,9 @@ There is **no** `pyproject.toml` in-repo as of v0.1; packaging is planned as a l
 | [`docs/AURORA_VISION.md`](docs/AURORA_VISION.md) | North-star vision and program framing. |
 | [`docs/AURORA_OPERATING_MANUAL.md`](docs/AURORA_OPERATING_MANUAL.md) | How to use and verify the repo today. |
 | [`docs/milestone_summaries/README.md`](docs/milestone_summaries/README.md) | Public narrative summaries for milestones **M01–M31** (index + one file per milestone). |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution expectations and boundaries. |
+| [`SECURITY.md`](SECURITY.md) | Vulnerability reporting. |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Contributor Covenant code of conduct. |
 | [`DEVELOPMENT.md`](DEVELOPMENT.md) | Tooling, CI behavior, and milestone-specific “what CI proves.” |
 | [`docs/runtime_substrate.md`](docs/runtime_substrate.md) | First-party package layout and provenance. |
 | [`docs/runtime_seam_framing.md`](docs/runtime_seam_framing.md) | Dispatcher / loader seams and async honesty. |
@@ -75,6 +80,6 @@ Required GitHub check: **`ci` / `repo-safety`**. When green, CI reflects the **d
 ## Contributing and governance
 
 - Prefer **small, reversible** changes with milestone-style acceptance criteria; the project record in [`docs/aurora.md`](docs/aurora.md) is the source of truth for what was proved and what was not.
-- For **contribution workflow** (PRs, branch protection expectations), see [`DEVELOPMENT.md`](DEVELOPMENT.md) and the operating manual.
+- See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`SECURITY.md`](SECURITY.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md); for tooling and CI, see [`DEVELOPMENT.md`](DEVELOPMENT.md) and the operating manual.
 
-A separate **`docs/`** tree at the **workspace** root (outside this repo) may hold local governance; it must **not** be committed into `aurora/` unless you intentionally add public material here.
+A separate **`docs/`** tree at the **workspace** root (outside this repo) may hold local governance; it must **not** be committed into `aurora/` unless you intentionally add public material here. The repository verifier rejects common **private workspace-style** path prefixes if they appear in the tracked tree (for example **`docs/prompts/`**, **`docs/manuals/`**, **`docs/milestones/`**).

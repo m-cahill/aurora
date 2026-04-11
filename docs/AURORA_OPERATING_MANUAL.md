@@ -3,7 +3,7 @@
 **Purpose:** Practical guide for contributors and downstream consumers working in this repository.  
 **Authority:** Proof claims, phase state, and milestone history are defined in [`aurora.md`](aurora.md). This manual does not strengthen or weaken those claims.
 
-**Last updated:** 2026-04-10 (M32)
+**Last updated:** 2026-04-10 (M32 baseline; **M33** packaging install path)
 
 ---
 
@@ -99,12 +99,13 @@ See [`aurora.md`](aurora.md) — *Proposed downstream repo layout and dependency
 
 ## 7. How to use AURORA today
 
-1. **Clone** this repository; use Python **3.11**.
-2. **`pip install -r requirements-dev.txt`** from the repo root.
-3. Set **`PYTHONPATH=src`** (see [`DEVELOPMENT.md`](../DEVELOPMENT.md) for Windows/macOS/Linux).
-4. **Verifier:** `python scripts/verify_repo_state.py` (writes under `artifacts/`).
-5. **Tests:** `python -m unittest discover -s tests -v`
-6. **Coverage:** follow the exact sequence in [`DEVELOPMENT.md`](../DEVELOPMENT.md) so gates match CI.
+1. **Clone** this repository; use Python **3.11** (see [`.python-version`](../.python-version)).
+2. From the repo root: **`pip install -r requirements-dev.txt`** then **`pip install -e .`** so **`import aurora`** works without **`PYTHONPATH`**.
+3. **Verifier:** `python scripts/verify_repo_state.py` (writes under `artifacts/`).
+4. **Tests:** `python -m unittest discover -s tests -v`
+5. **Coverage:** follow the exact sequence in [`DEVELOPMENT.md`](../DEVELOPMENT.md) so gates match CI.
+
+**Compatibility:** CI sets **`PYTHONPATH=src`** for the coverage job; you can mirror that locally instead of editable install if needed.
 
 **Import examples:**
 
@@ -120,7 +121,7 @@ from aurora.arb import write_arb, read_arb, validate_arb
 ## 8. Debugging and verification
 
 - **CI truth:** The required check is **`ci` / `repo-safety`**. Artifacts uploaded include Ruff JSON, coverage JSON, and unittest output when workflows are configured to upload them.
-- **Local failures:** Compare your commands to [`DEVELOPMENT.md`](../DEVELOPMENT.md); most import errors are **`PYTHONPATH`** not set to `src`.
+- **Local failures:** Compare your commands to [`DEVELOPMENT.md`](../DEVELOPMENT.md); most import errors are a missing **editable install** (`pip install -e .`) or **`PYTHONPATH`** not set to `src`.
 - **Seam behavior:** Read the “What M0x proves / does not prove” sections in [`DEVELOPMENT.md`](../DEVELOPMENT.md) for the relevant milestone — they are the contract for what tests exercise.
 
 ---
