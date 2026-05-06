@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from aurora.arb.canonical_json import canonicalize
 from aurora.arb.hasher import compute_root_hash, sha256_hex
@@ -48,7 +48,7 @@ def _json_object_from_bytes(data: bytes, *, rel: str) -> dict[str, Any]:
         _raise(f"{rel} is not valid JSON: {exc}", cause=exc)
     if not isinstance(obj, dict):
         _raise(f"{rel} must be a JSON object")
-    return obj
+    return cast(dict[str, Any], obj)
 
 
 def _assert_canonical_json_bytes(obj: dict[str, Any], raw: bytes, *, rel: str) -> None:
@@ -71,13 +71,14 @@ def _validate_sha256_manifest_object(obj: dict[str, Any]) -> list[dict[str, str]
     files_raw = obj.get("files")
     if not isinstance(files_raw, list):
         _raise('hashes/sha256_manifest.json "files" must be an array (spec §6.4)')
-    if len(files_raw) != len(_PAYLOAD_PATHS_ORDERED):
+    files_list = cast(list[Any], files_raw)
+    if len(files_list) != len(_PAYLOAD_PATHS_ORDERED):
         _raise(
             "hashes/sha256_manifest.json must list exactly "
             f"{len(_PAYLOAD_PATHS_ORDERED)} payload paths for minimal v0.1 ARB (spec §6.4)"
         )
     out: list[dict[str, str]] = []
-    for i, item in enumerate(files_raw):
+    for i, item in enumerate(files_list):
         if not isinstance(item, dict):
             _raise(f'hashes/sha256_manifest.json "files"[{i}] must be an object')
         if set(item.keys()) != {"path", "sha256"}:
