@@ -48,9 +48,13 @@ As in **[`aurora.md`](aurora.md)** and **[`docs/AURORA_OPERATING_MANUAL.md`](AUR
 
 SBOM and ARB baseline artifacts **do not** override these limits.
 
-## Release tag
+## Release tag (**M39** — **`v0.1.0`**)
 
-**M39 (v0.1.0 public release lock):** the **annotated** Git tag is **`v0.1.0`**. The tag is created **only after** the M39 release-lock pull request merges to **`main`** and **post-merge `main`** records green **`ci` / `repo-safety`** — see **`docs/aurora.md`** for authoritative PR/merge/tag/CI evidence (and any closeout-record PR).
+- **Tag:** **`v0.1.0`** (annotated) — tag object **`11d4bb1e7f9d24700deddbfb0833e44e227c1888`**, target commit **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`** (merge of **PR** **#51** — release-lock), tagger timestamp **2026-05-06T23:32:35Z** UTC.
+- **Release-lock PR** **#51** — final PR head **`b0b5643913dd3b803ef0be5a25579eaf973b7b7b`**; **`ci` / `repo-safety`:** **`25466621338`** (push, job **`74721250439`**), **`25466623128`** (pull_request, job **`74721255546`**).
+- **Post-merge `main` after release-lock:** **`ci` / `repo-safety`:** **`25467001467`** (job **`74722427884`**, head **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**) — authoritative clean-environment signal including **`pip-audit`**.
+- **Tag-push CI:** **`25467044831`** (job **`74722561540`**, **success**, ref **`v0.1.0`**, same tree as **`97edcdb`**).
+- **Closeout-record PR** (branch **`m39-closeout-record`**): merge commit and **post-closeout** **`main` `ci` / `repo-safety`** run/job IDs **recorded in [`docs/aurora.md`](aurora.md)** after that PR merges — **ensure all documentation is updated as necessary**.
 
 **Formal statement:** **[`docs/release_statement_v0.1.0.md`](release_statement_v0.1.0.md)**.
 

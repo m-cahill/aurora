@@ -6,7 +6,7 @@
 
 **AURORA v0.1.0** documents the **bounded, governed runtime and ARB v0.1 artifact substrate** delivered through milestone **M31** (runtime closeout) and the **M32–M39** public-release hardening tranche. **Runtime code** under `src/aurora/` remains **maintenance-only by default** after **M31** unless a downstream-driven milestone explicitly authorizes otherwise.
 
-The **annotated Git tag `v0.1.0`** is created **after** the M39 release-lock pull request merges and **post-merge `main`** records green **`ci` / `repo-safety`** (see **[`docs/aurora.md`](docs/aurora.md)** for PR/SHA/CI/tag evidence after closeout).
+**M39 release-lock** — **PR** **#51** merged **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`** (**2026-05-06T23:31:25Z** UTC). **PR head** **`b0b5643913dd3b803ef0be5a25579eaf973b7b7b`**. **`ci` / `repo-safety`:** **`25466621338`**, **`25466623128`**. **Post-merge `main`:** **`25467001467`**. **Annotated tag `v0.1.0`** — object **`11d4bb1e7f9d24700deddbfb0833e44e227c1888`**, target **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**, tagger **2026-05-06T23:32:35Z** UTC. **Tag-push CI:** **`25467044831`**. **Closeout-record PR** (`m39-closeout-record`): **final** merge/CI lines in **[`docs/aurora.md`](docs/aurora.md)** after that PR merges.
 
 ### Delivered
 
