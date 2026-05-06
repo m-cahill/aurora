@@ -37,7 +37,7 @@ An **explicit post-M31 public-release hardening tranche** (M32–M35) improves d
 ## Installation and local development
 
 - **Python 3.11** (matches [`.python-version`](.python-version)).
-- From the repository root: **`pip install -r requirements-dev.txt`** then **`pip install -e .`** so the **`aurora`** package is importable without setting **`PYTHONPATH`**. See **[`DEVELOPMENT.md`](DEVELOPMENT.md)** for verifier, Ruff, tests, and coverage commands.
+- From the repository root: **`pip install -r requirements-dev.txt`** then **`pip install -e .`** so the **`aurora`** package is importable without setting **`PYTHONPATH`**. See **[`DEVELOPMENT.md`](DEVELOPMENT.md)** for verifier, Ruff, tests, and coverage commands. Optional local preflight: **`make ci-local`** (requires `make`; raw equivalents are in **`DEVELOPMENT.md`** — *Local CI parity*).
 
 **Compatibility:** you can still run with **`PYTHONPATH=src`** (as CI does) if you prefer not to install the package in editable mode.
 

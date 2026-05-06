@@ -19,6 +19,47 @@ pip install -e .
 
 **Editable install** (`pip install -e .`) is the **preferred** way to make `import aurora` work locally without manual `PYTHONPATH` configuration. Dev tools remain listed in **`requirements-dev.txt`** (M33 does not move them into `pyproject.toml`).
 
+## Local CI parity (M37)
+
+The authoritative merge gate remains GitHub Actions **`ci` / `repo-safety`**. **`make ci-local`** (below) is **local preflight convenience** only — it does **not** replace GitHub checks.
+
+M37 adds **no** runtime behavior, **no** workflow changes, **no** new dependencies, and **no** new proof claims (native decode, graph/TFLite, or MediaPipe parity posture is unchanged).
+
+With **`make`** and a POSIX shell (e.g. Git Bash or WSL on Windows), from the repository root:
+
+```bash
+make help
+make install-dev   # first-time / after dependency changes
+make ci-local      # verify → compile → test → coverage → mypy → ruff → pip-audit
+```
+
+Targets follow the same commands as **`DEVELOPMENT.md`** / **`.github/workflows/ci.yml`** (Ruff on **`scripts`**, **`tests`**, **`src`**; **Mypy** on **`src/aurora`**; **`pip-audit`** with no extra flags). **`make coverage`** writes **`artifacts/coverage.json`** and runs **`scripts/check_coverage_thresholds.py`** (default JSON path). **`make test`** runs **`unittest`** without coverage for a faster loop; **`make ci-local`** includes **`coverage`** as the CI-parity test gate.
+
+Optional **`make api-doc-check`** runs a stdlib-only helper that checks **`__all__`** vs **`docs/api/*.md`** headings — **not** part of GitHub Actions for M37.
+
+**Without `make` (Windows PowerShell example):** run the same steps manually:
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r requirements-dev.txt
+python -m pip install -e .
+python scripts/verify_repo_state.py
+python -m compileall -q scripts tests src
+python -m unittest discover -s tests -v
+python -c "import pathlib; pathlib.Path('artifacts').mkdir(parents=True, exist_ok=True)"
+$env:PYTHONPATH = "src"
+python -m coverage run --branch -m unittest discover -s tests -v
+Remove-Item Env:PYTHONPATH
+python -m coverage report
+python -m coverage json -o artifacts/coverage.json
+python scripts/check_coverage_thresholds.py
+mypy src/aurora
+ruff check scripts tests src
+pip-audit
+```
+
+After **`pip install -e .`**, you can omit **`$env:PYTHONPATH = "src"`** for coverage if imports already match CI; CI still sets **`PYTHONPATH=src`** for the coverage step.
+
 ## Run the repository verifier locally
 
 From the repository root (`aurora/`):
