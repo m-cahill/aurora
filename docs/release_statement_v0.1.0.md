@@ -6,7 +6,7 @@
 
 **Maintenance posture:** **Maintenance-only by default** for **`src/aurora/`** after **M31**; **M32–M39** were an authorized **public-release hardening** tranche without reopening runtime expansion by default.
 
-**Release lock:** **M39** release-lock **PR** **#51** merged **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`** (**2026-05-06T23:31:25Z** UTC). **Post-merge `main` `ci` / `repo-safety`:** **`25467001467`** (**success**). **Annotated tag `v0.1.0`** — object **`11d4bb1e7f9d24700deddbfb0833e44e227c1888`**, target **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**, tagger **2026-05-06T23:32:35Z** UTC; tag-push CI **`25467044831`**. **Closeout-record** evidence (**PR** opened from **`m39-closeout-record`**) **finalizes** the canonical record in **[`docs/aurora.md`](aurora.md)** — **ensure all documentation is updated as necessary**.
+**Release lock:** **M39** release-lock **PR** **#51** merged **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`** (**2026-05-06T23:31:25Z** UTC). **Post-merge `main` `ci` / `repo-safety`:** **`25467001467`** (**success**). **Annotated tag `v0.1.0`** — object **`11d4bb1e7f9d24700deddbfb0833e44e227c1888`**, target **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**, tagger **2026-05-06T23:32:35Z** UTC; tag-push CI **`25467044831`**. **Closeout-record PR** **#52** — merged **`6c5fb8cbd5ab3c4494cbabeb92654b345776e29a`**; PR head **`6d6087d509ca2f7c724fa32ec15f2860c1fa2186`**; PR **`ci` / `repo-safety`:** **`25467131432`**, **`25467133735`**; final **`main` `ci` / `repo-safety`:** **`25467184587`**. **M39 completion (UTC):** **2026-05-06T23:37:04Z**. Canonical record: **[`docs/aurora.md`](aurora.md)** — **ensure all documentation is updated as necessary**.
 
 ## Release artifact
 

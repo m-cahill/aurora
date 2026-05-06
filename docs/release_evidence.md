@@ -54,7 +54,7 @@ SBOM and ARB baseline artifacts **do not** override these limits.
 - **Release-lock PR** **#51** — final PR head **`b0b5643913dd3b803ef0be5a25579eaf973b7b7b`**; **`ci` / `repo-safety`:** **`25466621338`** (push, job **`74721250439`**), **`25466623128`** (pull_request, job **`74721255546`**).
 - **Post-merge `main` after release-lock:** **`ci` / `repo-safety`:** **`25467001467`** (job **`74722427884`**, head **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**) — authoritative clean-environment signal including **`pip-audit`**.
 - **Tag-push CI:** **`25467044831`** (job **`74722561540`**, **success**, ref **`v0.1.0`**, same tree as **`97edcdb`**).
-- **Closeout-record PR** (branch **`m39-closeout-record`**): merge commit and **post-closeout** **`main` `ci` / `repo-safety`** run/job IDs **recorded in [`docs/aurora.md`](aurora.md)** after that PR merges — **ensure all documentation is updated as necessary**.
+- **Closeout-record PR** **#52** — https://github.com/m-cahill/aurora/pull/52 — merge **`6c5fb8cbd5ab3c4494cbabeb92654b345776e29a`** (**2026-05-06T23:36:38Z** UTC); PR head **`6d6087d509ca2f7c724fa32ec15f2860c1fa2186`**; PR **`ci` / `repo-safety`:** **`25467131432`** (push, job **`74722823360`**), **`25467133735`** (pull_request, job **`74722829694`**). **Post-merge `main` (final):** **`25467184587`** (job **`74722979968`**, head **`6c5fb8cbd5ab3c4494cbabeb92654b345776e29a`**). **M39 completion (UTC):** **2026-05-06T23:37:04Z** — **ensure all documentation is updated as necessary**.
 
 **Formal statement:** **[`docs/release_statement_v0.1.0.md`](release_statement_v0.1.0.md)**.
 
