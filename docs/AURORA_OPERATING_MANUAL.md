@@ -3,7 +3,7 @@
 **Purpose:** Practical guide for contributors and downstream consumers working in this repository.  
 **Authority:** Proof claims, phase state, and milestone history are defined in [`aurora.md`](aurora.md). This manual does not strengthen or weaken those claims.
 
-**Last updated:** 2026-05-07 (**M39** — v0.1.0 release lock / tag milestone **in progress**; see [`CHANGELOG.md`](../CHANGELOG.md) and [`release_statement_v0.1.0.md`](release_statement_v0.1.0.md))
+**Last updated:** 2026-05-07 (**M39** — v0.1.0 release lock / annotated tag complete; see [`CHANGELOG.md`](../CHANGELOG.md) and [`release_statement_v0.1.0.md`](release_statement_v0.1.0.md))
 
 ---
 
