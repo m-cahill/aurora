@@ -6,11 +6,11 @@
 
 **Maintenance posture:** **Maintenance-only by default** for **`src/aurora/`** after **M31**; **M32–M39** were an authorized **public-release hardening** tranche without reopening runtime expansion by default.
 
-**Release lock:** Documentation in this milestone finalizes the **v0.1.0** public record. The **annotated tag `v0.1.0`** is applied only after the M39 release-lock change merges to **`main`** and **post-merge `main`** shows green **`ci` / `repo-safety`** (see **[`docs/aurora.md`](aurora.md)** for exact PR/SHA/CI/tag evidence after closeout).
+**Release lock:** **M39** release-lock **PR** **#51** merged **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`** (**2026-05-06T23:31:25Z** UTC). **Post-merge `main` `ci` / `repo-safety`:** **`25467001467`** (**success**). **Annotated tag `v0.1.0`** — object **`11d4bb1e7f9d24700deddbfb0833e44e227c1888`**, target **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**, tagger **2026-05-06T23:32:35Z** UTC; tag-push CI **`25467044831`**. **Closeout-record** evidence (**PR** opened from **`m39-closeout-record`**) **finalizes** the canonical record in **[`docs/aurora.md`](aurora.md)** — **ensure all documentation is updated as necessary**.
 
 ## Release artifact
 
-- **Git tag:** **`v0.1.0`** (annotated), target commit recorded in **`docs/aurora.md`** after tagging.
+- **Git tag:** **`v0.1.0`** (annotated), target **`97edcdbfa334eec1c06231256ef5a2d27cf643a2`**, tag object **`11d4bb1e7f9d24700deddbfb0833e44e227c1888`** (see **[`docs/aurora.md`](aurora.md)**).
 - **Python package (source layout):** version **0.1.0** in **`pyproject.toml`** — editable install documented in **`README.md`** / **`DEVELOPMENT.md`**. **No PyPI publication** is implied by this release statement.
 
 ## Public handoff surface
