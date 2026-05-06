@@ -3,7 +3,7 @@
 # M34 — static analysis + supply-chain audit (exact pins; reproducible CI).
 # setuptools — pin so `pip-audit` does not flag the stdlib-venv default (e.g. 65.5.0 on Windows).
 coverage==7.6.12
-mypy==1.20.0
+mypy==1.20.2
 pip-audit==2.10.0
 ruff==0.15.7
 setuptools==82.0.1
