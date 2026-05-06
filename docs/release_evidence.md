@@ -50,7 +50,13 @@ SBOM and ARB baseline artifacts **do not** override these limits.
 
 ## Release tag
 
-**Deferred** to **M39** (final public release lock / tag). **M38** does **not** create a release tag.
+**M39 (v0.1.0 public release lock):** the **annotated** Git tag is **`v0.1.0`**. The tag is created **only after** the M39 release-lock pull request merges to **`main`** and **post-merge `main`** records green **`ci` / `repo-safety`** — see **`docs/aurora.md`** for authoritative PR/merge/tag/CI evidence (and any closeout-record PR).
+
+**Formal statement:** **[`docs/release_statement_v0.1.0.md`](release_statement_v0.1.0.md)**.
+
+**Changelog:** **[`CHANGELOG.md`](../CHANGELOG.md)** — `v0.1.0` entry.
+
+**M39 does not** add PyPI publication or a tag-driven release automation workflow unless separately authorized. **M38** evidence above remains unchanged in meaning (SBOM + ARB baseline are **not** full product lifecycle or SLA proof).
 
 ## See also
 

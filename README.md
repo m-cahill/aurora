@@ -47,6 +47,8 @@ Packaging metadata is declared in **[`pyproject.toml`](pyproject.toml)** (versio
 
 | Document | Role |
 |----------|------|
+| [`CHANGELOG.md`](CHANGELOG.md) | **v0.1.0** release notes (bounded scope and non-proofs). |
+| [`docs/release_statement_v0.1.0.md`](docs/release_statement_v0.1.0.md) | Formal **v0.1.0** release statement (proves / does not prove). |
 | [`docs/aurora.md`](docs/aurora.md) | Canonical repo record: phases, milestones, boundaries, proof posture. |
 | [`docs/api/README.md`](docs/api/README.md) | Hand-curated public API index (`aurora.runtime`, `aurora.arb`) — **`__all__`**-aligned. |
 | [`docs/AURORA_VISION.md`](docs/AURORA_VISION.md) | North-star vision and program framing. |
