@@ -4,7 +4,7 @@ This document describes **how** AURORA records **bounded, non-authoritative** ti
 
 ## Scope
 
-- **In scope:** [`aurora.arb`](api/arb.md) surfaces implemented under [`src/aurora/arb/`](../src/aurora/arb/) — **canonical JSON serialization** (`canonicalize`), **hash helpers** (`sha256_hex`, `compute_root_hash`), **`write_arb`**, **`read_arb`**, **`validate_arb`** — using a **deterministic synthetic** bundle shaped like the spec §8 illustration (see tests under [`tests/test_arb_writer.py`](../tests/test_arb_writer.py)).
+- **In scope:** [`aurora.arb`](api/arb.md) surfaces implemented under [`src/aurora/arb/__init__.py`](../src/aurora/arb/__init__.py) — **canonical JSON serialization** (`canonicalize`), **hash helpers** (`sha256_hex`, `compute_root_hash`), **`write_arb`**, **`read_arb`**, **`validate_arb`** — using a **deterministic synthetic** bundle shaped like the spec §8 illustration (see tests under [`tests/test_arb_writer.py`](../tests/test_arb_writer.py)).
 - **Out of scope / explicit non-proofs:** These timings are **not** evidence of **native execution** performance, **audio decode** performance, **graph / TFLite** runtime performance, **MediaPipe application parity**, or **BirdCLEF / PANTANAL-1** inference performance. They do **not** define SLAs, regression gates, or production SLOs.
 
 ## Method
