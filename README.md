@@ -59,6 +59,8 @@ Packaging metadata is declared in **[`pyproject.toml`](pyproject.toml)** (versio
 | [`docs/runtime_substrate.md`](docs/runtime_substrate.md) | First-party package layout and provenance. |
 | [`docs/runtime_seam_framing.md`](docs/runtime_seam_framing.md) | Dispatcher / loader seams and async honesty. |
 | [`docs/aurora_run_bundle_boundary.md`](docs/aurora_run_bundle_boundary.md) / [`docs/aurora_run_bundle_v0_spec.md`](docs/aurora_run_bundle_v0_spec.md) | ARB boundary and v0.1 on-disk spec. |
+| [`docs/arb_performance_baseline.md`](docs/arb_performance_baseline.md) | M38 — ARB API baseline timing methodology (non-SLA evidence). |
+| [`docs/release_evidence.md`](docs/release_evidence.md) | M38 — CI, coverage, and supply-chain evidence summary (not a release statement). |
 
 ## Repository boundary rules
 

@@ -53,6 +53,18 @@ jobs:
       - name: Dependency vulnerability audit (pip-audit; full environment)
         run: pip-audit
 
+      - name: Generate CycloneDX SBOM evidence (pip-audit)
+        run: pip-audit -f cyclonedx-json -o artifacts/sbom.cdx.json
+
+      - name: Generate ARB performance baseline evidence
+        env:
+          PYTHONPATH: src
+        run: >-
+          python scripts/measure_arb_performance.py
+          --iterations 50
+          --repeat 5
+          --output artifacts/arb_performance_baseline.json
+
       - name: Upload CI artifacts
         if: always()
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0

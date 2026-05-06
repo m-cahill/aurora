@@ -1,7 +1,7 @@
 # Local workflow helpers (M37). Authoritative merge gate: GitHub Actions ci / repo-safety.
 # Requires POSIX-style make (e.g. Git for Windows, WSL). See DEVELOPMENT.md for raw commands.
 
-.PHONY: help install-dev verify compile test coverage mypy ruff audit ci-local clean api-doc-check
+.PHONY: help install-dev verify compile test coverage mypy ruff audit ci-local clean api-doc-check performance sbom release-evidence
 
 help:
 	@echo "Available targets:"
@@ -14,6 +14,9 @@ help:
 	@echo "  ruff          Run ruff check (scripts, tests, src)"
 	@echo "  audit         Run pip-audit (full environment)"
 	@echo "  ci-local      Local sequence: verify, compile, test, coverage, mypy, ruff, audit"
+	@echo "  performance   ARB baseline JSON (M38; evidence only — not a gate)"
+	@echo "  sbom          CycloneDX JSON via pip-audit (M38; CI is authoritative)"
+	@echo "  release-evidence  coverage + performance + sbom (optional aggregate)"
 	@echo "  api-doc-check Check API docs vs __all__ (stdlib helper; not in CI)"
 	@echo "  clean         Remove __pycache__, .coverage, and local coverage JSON artifacts"
 
@@ -48,6 +51,16 @@ audit:
 	pip-audit
 
 ci-local: verify compile test coverage mypy ruff audit
+
+performance:
+	python -c "import pathlib; pathlib.Path('artifacts').mkdir(parents=True, exist_ok=True)"
+	PYTHONPATH=src python scripts/measure_arb_performance.py --output artifacts/arb_performance_baseline.json
+
+sbom:
+	python -c "import pathlib; pathlib.Path('artifacts').mkdir(parents=True, exist_ok=True)"
+	pip-audit -f cyclonedx-json -o artifacts/sbom.cdx.json
+
+release-evidence: coverage performance sbom
 
 api-doc-check:
 	python scripts/check_api_docs_exports.py
