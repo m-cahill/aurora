@@ -3,7 +3,7 @@
 **Purpose:** Practical guide for contributors and downstream consumers working in this repository.  
 **Authority:** Proof claims, phase state, and milestone history are defined in [`aurora.md`](aurora.md). This manual does not strengthen or weaken those claims.
 
-**Last updated:** 2026-05-06 (**M37** — `Makefile` local parity; **M34** QA posture unchanged)
+**Last updated:** 2026-05-07 (**M38** — release evidence artifacts + ARB baseline helper; **M37** local parity unchanged)
 
 ---
 
@@ -124,7 +124,7 @@ from aurora.arb import write_arb, read_arb, validate_arb
 
 ## 8. Debugging and verification
 
-- **CI truth:** The required check is **`ci` / `repo-safety`**. It enforces **Mypy** (strict, `src/aurora/`), **`pip-audit`** (full installed environment), Ruff, coverage gates, and the verifier — see [`DEVELOPMENT.md`](../DEVELOPMENT.md). Artifacts uploaded include Ruff JSON, coverage JSON, and unittest output when workflows are configured to upload them.
+- **CI truth:** The required check is **`ci` / `repo-safety`**. It enforces **Mypy** (strict, `src/aurora/`), **`pip-audit`** (full installed environment), Ruff, coverage gates, and the verifier — see [`DEVELOPMENT.md`](../DEVELOPMENT.md). Uploaded **`ci-artifacts`** include **`coverage.json`**, **`ruff.json`**, unittest output, **`arb_performance_baseline.json`**, and **`sbom.cdx.json`** (**M38**) when the workflow completes.
 - **Local failures:** Compare your commands to [`DEVELOPMENT.md`](../DEVELOPMENT.md) — including **Local CI parity** and **`make ci-local`** — most import errors are a missing **editable install** (`pip install -e .`) or **`PYTHONPATH`** not set to `src`. **Mypy** and **import resolution** for `aurora.*` need the same editable install as CI (**M34**).
 - **Seam behavior:** Read the “What M0x proves / does not prove” sections in [`DEVELOPMENT.md`](../DEVELOPMENT.md) for the relevant milestone — they are the contract for what tests exercise.
 

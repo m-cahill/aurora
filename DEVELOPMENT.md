@@ -37,6 +37,8 @@ Targets follow the same commands as **`DEVELOPMENT.md`** / **`.github/workflows/
 
 Optional **`make api-doc-check`** runs a stdlib-only helper that checks **`__all__`** vs **`docs/api/*.md`** headings — **not** part of GitHub Actions for M37.
 
+**M38** adds **optional** targets (**not** in **`ci-local`** by default): **`make performance`** (ARB baseline JSON), **`make sbom`** (**CycloneDX** JSON via pinned **`pip-audit`**), and **`make release-evidence`** (**`coverage`** then **`performance`** then **`sbom`**). See **[`docs/arb_performance_baseline.md`](docs/arb_performance_baseline.md)** and **[`docs/release_evidence.md`](docs/release_evidence.md)**. The same **`pip-audit`** global-environment caveat as above applies to **`sbom`**; **CI** is authoritative.
+
 **Without `make` (Windows PowerShell example):** run the same steps manually:
 
 ```powershell
