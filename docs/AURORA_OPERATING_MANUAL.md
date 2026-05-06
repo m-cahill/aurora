@@ -3,7 +3,7 @@
 **Purpose:** Practical guide for contributors and downstream consumers working in this repository.  
 **Authority:** Proof claims, phase state, and milestone history are defined in [`aurora.md`](aurora.md). This manual does not strengthen or weaken those claims.
 
-**Last updated:** 2026-05-07 (**M38** — release evidence artifacts + ARB baseline helper; **M37** local parity unchanged)
+**Last updated:** 2026-05-07 (**M39** — v0.1.0 release lock / tag milestone **in progress**; see [`CHANGELOG.md`](../CHANGELOG.md) and [`release_statement_v0.1.0.md`](release_statement_v0.1.0.md))
 
 ---
 
@@ -156,6 +156,7 @@ Treat as **stable for downstream** when taking a dependency on this repo (see al
 | Need | Document |
 |------|----------|
 | Full history and ledger | [`aurora.md`](aurora.md) |
+| **v0.1.0** release record | [`CHANGELOG.md`](../CHANGELOG.md), [`release_statement_v0.1.0.md`](release_statement_v0.1.0.md) |
 | Vision and program framing | [`AURORA_VISION.md`](AURORA_VISION.md) |
 | Milestone narratives (M01–M31) | [`milestone_summaries/README.md`](milestone_summaries/README.md) |
 | CI and tools | [`../DEVELOPMENT.md`](../DEVELOPMENT.md) |
