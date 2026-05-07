@@ -1,6 +1,6 @@
 # Milestone summaries (public)
 
-This directory contains **public-facing narrative summaries** for completed milestones **M01–M31**. They are derived from the committed project record ([`../aurora.md`](../aurora.md)), [`DEVELOPMENT.md`](../../DEVELOPMENT.md), and (where helpful) workspace milestone artifacts. They are **not** verbatim copies of internal governance prompts or tool logs.
+This directory contains **public-facing narrative summaries** for completed milestones **M01–M39**. They are derived from the committed project record ([`../aurora.md`](../aurora.md)), [`DEVELOPMENT.md`](../../DEVELOPMENT.md), and (where helpful) workspace milestone artifacts. They are **not** verbatim copies of internal governance prompts or tool logs.
 
 **Audience:** Contributors, downstream consumers, and readers who want the story of the program without parsing the full ledger.
 
@@ -43,3 +43,11 @@ This directory contains **public-facing narrative summaries** for completed mile
 | [M29](M29.md) | ARB validator |
 | [M30](M30.md) | ARB CLI validator |
 | [M31](M31.md) | v0.1 project closeout |
+| [M32](M32.md) | Public documentation surface |
+| [M33](M33.md) | Packaging and OSS hygiene |
+| [M34](M34.md) | CI / QA / supply-chain hardening |
+| [M35](M35.md) | Pre-release audit and remediation plan |
+| [M36](M36.md) | ADRs and public API reference |
+| [M37](M37.md) | Developer experience / local CI parity |
+| [M38](M38.md) | ARB perf baseline + SBOM / release evidence |
+| [M39](M39.md) | v0.1.0 release lock and tag |

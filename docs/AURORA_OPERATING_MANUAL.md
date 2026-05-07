@@ -158,5 +158,5 @@ Treat as **stable for downstream** when taking a dependency on this repo (see al
 | Full history and ledger | [`aurora.md`](aurora.md) |
 | **v0.1.0** release record | [`CHANGELOG.md`](../CHANGELOG.md), [`release_statement_v0.1.0.md`](release_statement_v0.1.0.md) |
 | Vision and program framing | [`AURORA_VISION.md`](AURORA_VISION.md) |
-| Milestone narratives (M01–M31) | [`milestone_summaries/README.md`](milestone_summaries/README.md) |
+| Milestone narratives (M01–M39) | [`milestone_summaries/README.md`](milestone_summaries/README.md) |
 | CI and tools | [`../DEVELOPMENT.md`](../DEVELOPMENT.md) |
