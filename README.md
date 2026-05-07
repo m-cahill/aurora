@@ -53,7 +53,7 @@ Packaging metadata is declared in **[`pyproject.toml`](pyproject.toml)** (versio
 | [`docs/api/README.md`](docs/api/README.md) | Hand-curated public API index (`aurora.runtime`, `aurora.arb`) — **`__all__`**-aligned. |
 | [`docs/AURORA_VISION.md`](docs/AURORA_VISION.md) | North-star vision and program framing. |
 | [`docs/AURORA_OPERATING_MANUAL.md`](docs/AURORA_OPERATING_MANUAL.md) | How to use and verify the repo today. |
-| [`docs/milestone_summaries/README.md`](docs/milestone_summaries/README.md) | Public narrative summaries for milestones **M01–M31** (index + one file per milestone). |
+| [`docs/milestone_summaries/README.md`](docs/milestone_summaries/README.md) | Public narrative summaries for milestones **M01–M39** (index + one file per milestone). |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution expectations and boundaries. |
 | [`SECURITY.md`](SECURITY.md) | Vulnerability reporting. |
 | [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Contributor Covenant code of conduct. |
